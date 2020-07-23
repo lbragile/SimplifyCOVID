@@ -1,0 +1,26 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  width: 100%;
+}
+
+svg {
+  display: block;
+  width: 50%;
+  margin: 10px auto;
+}
+
+path {
+  fill: blue;
+  stroke: red;
+  stroke-width: 2px;
+  stroke-opacity: 0.2;
+}
+
+path:hover {
+  fill: yellow;
+}
