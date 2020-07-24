@@ -3,10 +3,16 @@ var colors = "red green orange pink white black cyan magenta lightgreen lightcor
 );
 var i = 0;
 
+var $link = $("a");
+var $info_box = $(".info-box li");
+
+// $link.css("position", "absolute");
+// $("svg").css("position", "relative");
+
 function displayStatsPerCountry(data) {
   let summary = data["Countries"];
 
-  $("a").on("click mouseenter mouseleave", function (event) {
+  $link.on("click", function (event) {
     let path = $(this).children().first();
 
     if (event.type == "click") {
@@ -17,13 +23,38 @@ function displayStatsPerCountry(data) {
       console.log(path.attr("id"));
 
       let country = summary[index];
+      let stats = [
+        { Country: [country.Country, country.CountryCode] },
+        { "New Confirmed": country.NewConfirmed },
+        { "Total Confirmed": country.TotalConfirmed + country.NewConfirmed },
+        { "New Deaths": country.NewDeaths },
+        { "Total Deaths": country.TotalDeaths + country.NewDeaths },
+        { "New Recovered": country.NewRecovered },
+        { "Total Recovered": country.TotalRecovered + country.NewRecovered },
+      ];
+
+      $.each($info_box, (index) => {
+        let key = Object.keys(stats[index])[0],
+          value = Object.values(stats[index])[0];
+
+        if (index == 0) {
+          $info_box.eq(index).html(`${value[0]} (${value[1]})`);
+        } else {
+          $info_box.eq(index).html(`${key}: ${value}`);
+        }
+      });
+
       console.log(
-        `${country.Slug} - New Confirmed: ${country.NewConfirmed}, Total Confirmed: ${country.TotalConfirmed}, New Deaths: ${country.NewDeaths}, Total Deaths: ${country.TotalDeaths}, New Recovered: ${country.NewRecovered}, Total Recovered: ${country.TotalRecovered}`
+        `${country.Slug} - New Confirmed: ${
+          country.NewConfirmed
+        }, Total Confirmed: ${
+          country.TotalConfirmed + country.NewConfirmed
+        }, New Deaths: ${country.NewDeaths}, Total Deaths: ${
+          country.TotalDeaths + country.NewDeaths
+        }, New Recovered: ${country.NewRecovered}, Total Recovered: ${
+          country.TotalRecovered + country.NewRecovered
+        }`
       );
-    } else if (event.type == "mouseenter") {
-      path.css("fill", "yellow");
-    } else {
-      path.css("fill", "blue");
     }
   });
 }
