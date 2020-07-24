@@ -5,22 +5,23 @@
 }
 
 body {
-  width: 100%;
+  width: 100vw;
+  height: 100vh;
 }
 
-svg {
+.svg_container {
   display: block;
   width: 50%;
-  margin: 10px auto;
+  margin: 0 auto;
 }
 
-path {
+.svg_container path {
   fill: blue;
   stroke: red;
   stroke-width: 2px;
   stroke-opacity: 0.2;
 }
 
-path:hover {
+/* .svg_container path:hover {
   fill: yellow;
-}
+} */
