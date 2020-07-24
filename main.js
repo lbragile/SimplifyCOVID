@@ -1,36 +1,49 @@
-var colors = "red green orange pink white black cyan magenta lightgreen lightcoral".split(
-  " "
-);
-var i = 0;
-
 var $link = $("a");
+var paths = $("path");
 var $info_box = $(".info-box li");
 
-// $link.css("position", "absolute");
-// $("svg").css("position", "relative");
+function addText(p) {
+  var t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  var b = p.getBBox();
+  t.setAttribute(
+    "transform",
+    "translate(" + (b.x + b.width / 2) + " " + (b.y + b.height / 2) + ")"
+  );
+  t.textContent = p.getAttribute("data-name");
+  t.setAttribute("fill", "lightgreen");
+  t.setAttribute("font-size", "14");
+  t.setAttribute("font-weight", "bolder");
+  t.setAttribute("user-select", "none");
+
+  p.parentNode.insertBefore(t, p.nextSibling);
+}
 
 function displayStatsPerCountry(data) {
   let summary = data["Countries"];
 
+  $.each(paths, (index) => {
+    addText(paths[index]);
+  });
+
   $link.on("click", function (event) {
-    let path = $(this).children().first();
+    let $path = $(this).children().first();
 
     if (event.type == "click") {
       var index = summary.findIndex(function (item) {
-        return item.CountryCode == path.attr("id");
+        return item.CountryCode === $path.attr("id");
       });
 
-      console.log(path.attr("id"));
-
+      console.log(index);
+      console.log(summary[index]);
       let country = summary[index];
       let stats = [
         { Country: [country.Country, country.CountryCode] },
         { "New Confirmed": country.NewConfirmed },
-        { "Total Confirmed": country.TotalConfirmed + country.NewConfirmed },
+        { "Total Confirmed": country.TotalConfirmed },
         { "New Deaths": country.NewDeaths },
-        { "Total Deaths": country.TotalDeaths + country.NewDeaths },
+        { "Total Deaths": country.TotalDeaths },
         { "New Recovered": country.NewRecovered },
-        { "Total Recovered": country.TotalRecovered + country.NewRecovered },
+        { "Total Recovered": country.TotalRecovered },
       ];
 
       $.each($info_box, (index) => {
@@ -44,63 +57,28 @@ function displayStatsPerCountry(data) {
         }
       });
 
-      console.log(
-        `${country.Slug} - New Confirmed: ${
-          country.NewConfirmed
-        }, Total Confirmed: ${
-          country.TotalConfirmed + country.NewConfirmed
-        }, New Deaths: ${country.NewDeaths}, Total Deaths: ${
-          country.TotalDeaths + country.NewDeaths
-        }, New Recovered: ${country.NewRecovered}, Total Recovered: ${
-          country.TotalRecovered + country.NewRecovered
-        }`
-      );
+      $info_box
+        .parents("div")
+        .css({ left: event.pageX - 10, top: event.pageY - 10 });
+      $info_box.parents("div").show(1000);
     }
+  });
+
+  $info_box.parents("div").on("mouseleave", function () {
+    $info_box.parents("div").hide(1000);
   });
 }
 
-var country_summary = [];
-
-// sample
-// {
-//   "Global": {
-//     "NewConfirmed": 100282,
-//     "TotalConfirmed": 1162857,
-//     "NewDeaths": 5658,
-//     "TotalDeaths": 63263,
-//     "NewRecovered": 15405,
-//     "TotalRecovered": 230845
-//   },
-//   "Countries": [
-//     {
-//       "Country": "ALA Aland Islands",
-//       "CountryCode": "AX",
-//       "Slug": "ala-aland-islands",
-//       "NewConfirmed": 0,
-//       "TotalConfirmed": 0,
-//       "NewDeaths": 0,
-//       "TotalDeaths": 0,
-//       "NewRecovered": 0,
-//       "TotalRecovered": 0,
-//       "Date": "2020-04-05T06:37:00Z"
-//     }
-
-// function processData(data) {
-//   country_summary = data["Countries"];
-//   displayStatsPerCountry(country_summary);
-//   // $.each(country_summary, function (index, item) {
-//   //   displayStatsPerCountry(item);
-//   //   // console.log(index + ": " + item["Country"] + " - " + item["TotalDeaths"]);
-//   // });
-// }
-
 $.ajax({
+  type: "GET",
   url: "https://api.covid19api.com/summary",
-  beforeSend: function (xhr) {
-    xhr.setRequestHeader(
-      "Authorization",
-      "Bearer 6QXNMEMFHNY4FJ5ELNFMP5KRW52WFXN5"
-    );
-  },
   success: (data) => displayStatsPerCountry(data),
 });
+
+// $.ajax({
+//   type: "GET",
+//   url: "https://data.opendatasoft.com/api/datasets/1.0/search/?rows=195",
+//   success: (data) => console.log(data),
+// });
+
+// https://corona.lmao.ninja/

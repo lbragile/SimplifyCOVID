@@ -11,7 +11,7 @@ body {
 
 .svg_container {
   display: block;
-  width: 75%;
+  width: 100%;
   margin: 0 auto;
 }
 
@@ -20,6 +20,11 @@ body {
   stroke: blue;
   stroke-width: 3px;
   stroke-opacity: 0.5;
+}
+
+.info-box {
+  display: none;
+  position: absolute;
 }
 
 .info-box li {
