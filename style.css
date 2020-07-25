@@ -35,14 +35,31 @@ body {
 }
 
 .info-box ul {
+  position: relative;
   background: rgba(0, 0, 0, 0.9);
   width: 200px;
   border-radius: 5%;
   border: 1px solid green;
   margin: 0 auto;
-  /* display: none; */
+}
+
+.info-box ul::after {
+  content: "";
+  background: transparent;
+  position: absolute;
+  margin-left: -5px;
+
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 10px solid rgba(0, 0, 0, 0.9);
+
+  top: 100%;
+  left: 50%;
 }
 
 .svg_container path:hover {
   fill: yellow;
+  cursor: crosshair;
 }
