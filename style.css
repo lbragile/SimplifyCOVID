@@ -9,17 +9,18 @@ body {
   height: 100vh;
 }
 
-.svg_container {
+.svg-container {
   display: block;
   width: 100%;
   margin: 0 auto;
+  position: relative;
 }
 
-.svg_container path {
-  fill: gray;
-  stroke: blue;
-  stroke-width: 3px;
-  stroke-opacity: 0.5;
+.svg-container path {
+  /* fill: gray; */
+  stroke: black;
+  stroke-width: 1px;
+  stroke-opacity: 0.2;
 }
 
 .info-box {
@@ -29,7 +30,7 @@ body {
 
 .info-box li {
   list-style: none;
-  padding: 5px;
+  padding: 1px;
   color: white;
   text-align: left;
 }
@@ -41,6 +42,8 @@ body {
   border-radius: 5%;
   border: 1px solid green;
   margin: 0 auto;
+  padding: 5px;
+  z-index: 2;
 }
 
 .info-box ul::after {
@@ -59,7 +62,27 @@ body {
   left: 50%;
 }
 
-.svg_container path:hover {
-  fill: yellow;
+path:hover {
+  fill: cyan;
   cursor: crosshair;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: center; /* vertical center */
+  align-items: center; /* horizontal center */
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  /* position: fixed; */
+}
+
+button {
+  padding: 5px;
+  width: 30px;
+  font-weight: bold;
+  font-size: 1em;
+  color: black;
 }
