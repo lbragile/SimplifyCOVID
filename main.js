@@ -3,10 +3,16 @@ var $paths = $("path");
 var $info_box = $(".info-box li");
 var $input = $("#scaling");
 
-function caseHeatMap(summary) {
+function caseHeatMap(summary, type) {
   var country_cases = [];
   $.each(summary, function (index, item) {
-    country_cases.push(item.todayCases);
+    if (type == "cases") {
+      country_cases.push(item.todayCases);
+    } else if (type == "deaths") {
+      country_cases.push(item.todayDeaths);
+    } else {
+      country_cases.push(item.todayRecovered);
+    }
   });
 
   p50_cases =
@@ -58,7 +64,6 @@ function addText(p) {
   t.setAttribute("fill", "black");
   t.setAttribute("font-size", "14");
   t.setAttribute("font-weight", "bolder");
-  t.setAttribute("user-select", "none");
 
   p.parentNode.insertBefore(t, p.nextSibling);
 }
@@ -69,6 +74,14 @@ function getIndex(summary, id) {
   });
 
   return index;
+}
+
+function statisticHeatMap(summary) {
+  $.each($(".options").children("input"), (index, value) => {
+    if ($(value).is(":checked")) {
+      caseHeatMap(summary, value.id);
+    }
+  });
 }
 
 function displayStatsPerCountry(summary) {
@@ -97,6 +110,7 @@ function displayStatsPerCountry(summary) {
       "Netherlands",
       "Czechia",
       "Belgium",
+      "Rwanda",
     ];
     var include_countries = ["Greenland", "Mongolia"];
 
@@ -110,47 +124,52 @@ function displayStatsPerCountry(summary) {
   });
 
   // color countries based on number of cases
-  caseHeatMap(summary);
+  statisticHeatMap(summary);
 
   // map functionality
   $link.on("mouseenter mousemove mouseleave", function (event) {
     let path = $(this).children().first("path");
-    let index;
+    let index = getIndex(summary, path.attr("id"));
 
-    if (event.type == "mouseenter") {
-      index = getIndex(summary, path.attr("id"));
-      path.css("fill", "cyan");
+    if (index != -1) {
+      if (event.type == "mouseenter") {
+        path.css("fill", "cyan");
 
-      let country = summary[index];
-      let stats = [
-        { Country: [country.country, country.countryInfo.iso2] },
-        { "New Confirmed": country.todayCases },
-        { "Total Confirmed": country.cases },
-        { "New Deaths": country.todayDeaths },
-        { "Total Deaths": country.deaths },
-        { "New Recovered": country.todayRecovered },
-        { "Total Recovered": country.recovered },
-      ];
+        let country = summary[index];
+        let stats = [
+          { Country: [country.country, country.countryInfo.iso2] },
+          { "New Confirmed": country.todayCases },
+          { "Total Confirmed": country.cases },
+          { "New Deaths": country.todayDeaths },
+          { "Total Deaths": country.deaths },
+          { "New Recovered": country.todayRecovered },
+          { "Total Recovered": country.recovered },
+        ];
 
-      $.each($info_box, (index) => {
-        let key = Object.keys(stats[index])[0],
-          value = Object.values(stats[index])[0];
+        $.each($info_box, (index) => {
+          let key = Object.keys(stats[index])[0],
+            value = Object.values(stats[index])[0];
 
-        if (index == 0) {
-          $info_box.eq(index).html(`${value[0]} (${value[1]})`);
-        } else {
-          $info_box.eq(index).html(`${key}: ${value}`);
-        }
-      });
-    } else if (event.type == "mousemove") {
-      $info_box
-        .parents("div")
-        .css({ left: event.pageX - 100, top: event.pageY - 166 });
-      $info_box.parents("div").show();
-    } else {
-      $info_box.parents("div").hide();
-      caseHeatMap(summary);
+          if (index == 0) {
+            $info_box.eq(index).html(`${value[0]} (${value[1]})`);
+          } else {
+            $info_box.eq(index).html(`${key}: ${value}`);
+          }
+        });
+      } else if (event.type == "mousemove") {
+        $info_box
+          .parents("div")
+          .css({ left: event.pageX - 100, top: event.pageY - 166 });
+        $info_box.parents("div").show();
+      } else {
+        $info_box.parents("div").hide();
+        statisticHeatMap(summary);
+      }
     }
+
+    $(".options")
+      .children("input")
+      .on("click", () => statisticHeatMap(summary));
   });
 }
 
@@ -160,119 +179,114 @@ $.ajax({
   success: (data) => displayStatsPerCountry(data),
 });
 
-// var selection = document.getElementById("select-rectangle"),
-//   x1 = 0,
-//   y1 = 0,
-//   x2 = 0,
-//   y2 = 0;
-// function reCalc() {
-//   //This will restyle the div
-//   var x3 = Math.min(x1, x2); //Smaller X
-//   var x4 = Math.max(x1, x2); //Larger X
-//   var y3 = Math.min(y1, y2); //Smaller Y
-//   var y4 = Math.max(y1, y2); //Larger Y
-//   selection.style.left = x3 + "px";
-//   selection.style.top = y3 + "px";
-//   selection.style.width = x4 - x3 + "px";
-//   selection.style.height = y4 - y3 + "px";
-// }
-// onmousedown = function (e) {
-//   selection.hidden = 0; //Unhide the div
-//   x1 = e.clientX; //Set the initial X
-//   y1 = e.clientY; //Set the initial Y
-//   reCalc();
-// };
-// onmousemove = function (e) {
-//   x2 = e.clientX; //Update the current position X
-//   y2 = e.clientY; //Update the current position Y
-//   reCalc();
-// };
-// onmouseup = function (e) {
-//   selection.hidden = 1; //Hide the div
-//   pathsInRegion(selection);
-// };
-
-const NF = 16,
+const NUM_FRAMES = 2,
   NAV_MAP = {
     0: { dir: 1, act: "zoom", name: "in" },
+    107: { dir: 1, act: "zoom", name: "in" }, // numpad
+    187: { dir: 1, act: "zoom", name: "in" }, // near backspace
+
     1: { dir: -1, act: "zoom", name: "out" },
+    109: { dir: -1, act: "zoom", name: "out" }, // numpad
+    189: { dir: -1, act: "zoom", name: "out" }, // near backspace
+
     2: { dir: -1, act: "move", name: "up", axis: 1 },
-    3: { dir: 1, act: "move", name: "right", axis: 0 },
+    38: { dir: -1, act: "move", name: "up", axis: 1 },
+    3: { dir: -1, act: "move", name: "left", axis: 0 },
+    37: { dir: -1, act: "move", name: "left", axis: 0 },
     4: { dir: 1, act: "move", name: "down", axis: 1 },
-    5: { dir: -1, act: "move", name: "left", axis: 0 },
+    40: { dir: 1, act: "move", name: "down", axis: 1 },
+    5: { dir: 1, act: "move", name: "right", axis: 0 },
+    39: { dir: 1, act: "move", name: "right", axis: 0 },
   },
-  _SVG = document.querySelector("svg"),
-  VB = _SVG
-    .getAttribute("viewBox")
+  SVG = document.querySelector("svg"),
+  VIEW_BOX = SVG.getAttribute("viewBox")
     .split(" ")
     .map((c) => parseInt(c)),
-  DMAX = VB.slice(2),
-  WMIN = 8;
+  VIEW_MAX_DIM = VIEW_BOX.slice(2),
+  VIEW_MIN_DIM = 100;
 
-let rID = null,
-  f = 0,
+let requestID = null,
+  frame = 0,
   nav = {},
-  tg = Array(4);
-
-function stopAni() {
-  cancelAnimationFrame(rID);
-  rID = null;
-}
+  target = Array(4);
 
 function update() {
-  let k = ++f / NF,
+  let k = ++frame / NUM_FRAMES,
     j = 1 - k,
-    cvb = VB.slice();
+    current_viewbox = VIEW_BOX.slice();
 
   if (nav.act === "zoom") {
-    for (let i = 0; i < 4; i++) cvb[i] = j * VB[i] + k * tg[i];
+    for (let i = 0; i < 4; i++)
+      current_viewbox[i] = j * VIEW_BOX[i] + k * target[i];
   }
 
-  if (nav.act === "move") cvb[nav.axis] = j * VB[nav.axis] + k * tg[nav.axis];
+  if (nav.act === "move")
+    current_viewbox[nav.axis] = j * VIEW_BOX[nav.axis] + k * target[nav.axis];
 
-  _SVG.setAttribute("viewBox", cvb.join(" "));
+  SVG.setAttribute("viewBox", current_viewbox.join(" "));
 
-  if (!(f % NF)) {
-    f = 0;
-    VB.splice(0, 4, ...cvb);
+  if (!(frame % NUM_FRAMES)) {
+    frame = 0;
+    VIEW_BOX.splice(0, 4, ...current_viewbox);
     nav = {};
-    tg = Array(4);
-    stopAni();
+    target = Array(4);
+    cancelAnimationFrame(requestID);
+    requestID = null;
     return;
   }
 
-  rID = requestAnimationFrame(update);
+  requestID = requestAnimationFrame(update);
 }
 
-$("button").on("mouseover", (e) => {
+$("button").on("mouseover", () => {
   $("button").css("cursor", "pointer");
 });
 
-$("button").on("click", (e) => {
-  if (!rID && e.which == 1) {
-    nav = NAV_MAP[parseInt(e.target.id)];
+$("button, document").on("click keydown", (e) => {
+  e.preventDefault(); // when pressing arrow keys, this prevents the scroll bar from being activated
+
+  if (
+    !requestID &&
+    (e.which == 1 ||
+      (37 <= e.keyCode && e.keyCode <= 40) ||
+      e.keyCode == 107 ||
+      e.keyCode == 109 ||
+      e.keyCode == 187 ||
+      e.keyCode == 189)
+  ) {
+    if (e.which == 1) {
+      nav = NAV_MAP[parseInt(e.target.id)];
+    } else {
+      nav = NAV_MAP[parseInt(e.keyCode)];
+    }
 
     if (nav.act === "zoom") {
       if (
-        (nav.dir === -1 && VB[2] >= DMAX[0]) ||
-        (nav.dir === 1 && VB[2] <= WMIN)
+        (nav.dir === -1 && VIEW_BOX[2] >= VIEW_MAX_DIM[0]) ||
+        (nav.dir === 1 && VIEW_BOX[2] <= VIEW_MIN_DIM)
       ) {
+        if (nav.dir === -1 && VIEW_BOX[2] >= VIEW_MAX_DIM[0])
+          $(".move").css("visibility", "hidden");
         return;
       }
 
+      $(".move").css("visibility", "visible");
+
       for (let i = 0; i < 2; i++) {
-        tg[i + 2] = VB[i + 2] / Math.pow(2, nav.dir);
-        tg[i] = 0.5 * (DMAX[i] - tg[i + 2]);
+        target[i + 2] = VIEW_BOX[i + 2] / Math.pow(2, nav.dir);
+        target[i] = 0.5 * (VIEW_MAX_DIM[i] - target[i + 2]);
       }
     } else if (nav.act === "move") {
       if (
-        (nav.dir === -1 && VB[nav.axis] <= 0) ||
-        (nav.dir === 1 && VB[nav.axis] >= DMAX[nav.axis] - VB[2 + nav.axis])
+        (nav.dir === -1 && VIEW_BOX[nav.axis] <= 0) ||
+        (nav.dir === 1 &&
+          VIEW_BOX[nav.axis] >= VIEW_MAX_DIM[nav.axis] - VIEW_BOX[2 + nav.axis])
       ) {
         return;
       }
 
-      tg[nav.axis] = VB[nav.axis] + 0.5 * nav.dir * VB[2 + nav.axis];
+      target[nav.axis] =
+        VIEW_BOX[nav.axis] + 0.5 * nav.dir * VIEW_BOX[2 + nav.axis];
     }
 
     update();
