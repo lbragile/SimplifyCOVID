@@ -14,6 +14,10 @@ body {
   width: 80%;
   margin: 0 auto;
   position: relative;
+  border: 1px dashed black;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 0;
+  top: 17.5%;
 }
 
 .svg-container path {
@@ -71,8 +75,8 @@ path:hover {
   display: block;
   text-align: center;
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: 50%;
+  right: 35px;
   z-index: 2;
   float: left;
   position: fixed;
@@ -100,7 +104,93 @@ label {
 
 .options {
   position: fixed;
-  top: 250px;
+  top: 40%;
   left: 10px;
   z-index: 2;
+}
+
+.user-control {
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 50%;
+  left: 10px;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 22px;
+  margin: 5px 0;
+}
+
+/* origin checkbox */
+.switch input {
+  display: none;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 1px;
+  bottom: 1px;
+  background-color: white;
+  transition: all 0.4s;
+}
+
+input:checked + .slider {
+  background-color: #2196f3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196f3;
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+.switch p {
+  color: black;
+  position: absolute;
+  top: 0;
+  left: 120%;
+  font-size: 1.25rem;
+  padding: 0;
+  width: 150px;
+}
+
+.continents {
+  position: fixed;
+  top: 70%;
+  left: 10px;
+}
+
+.continents label {
+  margin: 0;
+  padding: 5px;
+  letter-spacing: 1px;
 }

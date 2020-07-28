@@ -2,6 +2,7 @@ var $link = $("a");
 var $paths = $("path");
 var $info_box = $(".info-box li");
 var $input = $("#scaling");
+var $continents = $(".continents");
 
 function caseHeatMap(summary, type) {
   var country_cases = [];
@@ -53,43 +54,7 @@ function caseHeatMap(summary, type) {
   });
 }
 
-function addText(p) {
-  var t = document.createElementNS("http://www.w3.org/2000/svg", "text");
-  var b = p.getBBox();
-  t.setAttribute(
-    "transform",
-    "translate(" + (b.x + b.width / 2) + " " + (b.y + b.height / 2) + ")"
-  );
-  t.textContent = p.getAttribute("data-name");
-  t.setAttribute("fill", "black");
-  t.setAttribute("font-size", "14");
-  t.setAttribute("font-weight", "bolder");
-
-  p.parentNode.insertBefore(t, p.nextSibling);
-}
-
-function getIndex(summary, id) {
-  var index = summary.findIndex(function (item) {
-    return item.countryInfo.iso2 == id;
-  });
-
-  return index;
-}
-
-function statisticHeatMap(summary) {
-  $.each($(".options").children("input"), (index, value) => {
-    if ($(value).is(":checked")) {
-      caseHeatMap(summary, value.id);
-    }
-  });
-}
-
-function displayStatsPerCountry(summary) {
-  // remove non-countries from the data
-  summary.splice(55, 1); // Diamond Princess
-  summary.splice(116, 1); // MS Zaandam
-
-  // add text to the countries
+function addText(summary) {
   $.each($paths, (pos, value) => {
     let id = value.getAttribute("id");
     if (id.length == 2) {
@@ -112,27 +77,110 @@ function displayStatsPerCountry(summary) {
       "Belgium",
       "Rwanda",
     ];
-    var include_countries = ["Greenland", "Mongolia"];
+    var include_countries = [
+      "Greenland",
+      "Mongolia",
+      "Fiji",
+      "New Zealand",
+      "Papua New Guinea",
+      "Uruguay",
+      "Paraguay",
+      "Libyan Arab Jamahiriya",
+      "Namibia",
+      "Gabon",
+    ];
 
     if (
       (summary[index].population > 10000000 &&
         !exclude_countries.includes(summary[index].country)) ||
       include_countries.includes(summary[index].country)
     ) {
-      addText($paths[pos]);
+      writeText($paths[pos]);
     }
   });
+}
+
+function writeText(p) {
+  var t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  var b = p.getBBox();
+  t.setAttribute(
+    "transform",
+    "translate(" + (b.x + b.width / 2) + " " + (b.y + b.height / 2) + ")"
+  );
+  t.textContent = p.getAttribute("data-name");
+  t.setAttribute("fill", "black");
+  t.setAttribute("font-size", "14");
+  t.setAttribute("font-weight", "bolder");
+  t.setAttribute("id", "text-" + p.getAttribute("id"));
+
+  p.parentNode.insertBefore(t, p.nextSibling);
+}
+
+function getIndex(summary, id) {
+  var index = summary.findIndex(function (item) {
+    return item.countryInfo.iso2 == id;
+  });
+
+  return index;
+}
+
+function statisticHeatMap(summary) {
+  $.each($(".options").children("input"), (index, value) => {
+    if ($(value).is(":checked")) {
+      caseHeatMap(summary, value.id);
+    }
+  });
+}
+
+function displayContinents(summary) {
+  var continent_included = [],
+    country_names = [];
+  $.each($continents.find("input"), (index, value) => {
+    if ($(value).is(":checked")) continent_included.push($(value).attr("name"));
+  });
+
+  $.each(summary, (index, value) => {
+    if (continent_included.includes(value.continent))
+      country_names.push(value.countryInfo.iso2);
+  });
+
+  $.each($paths, (index, path) => {
+    if (country_names.includes(path.id)) {
+      $(path).show();
+      $(`#text-${path.id}`).show(); // text
+    } else {
+      $(path).hide();
+      $(`#text-${path.id}`).hide(); // text
+    }
+  });
+}
+
+function displayStatsPerCountry(summary) {
+  // remove non-countries from the data
+  summary.splice(55, 1); // Diamond Princess
+  summary.splice(116, 1); // MS Zaandam
+
+  // add text to the countries
+  addText(summary);
+
+  // TODO
+  // $("#country-name :checkbox").on("change", () => {
+  //   console.log($(this).is(":checked"));
+  //   if ($(this).is(":checked")) {
+  //     addText(summary);
+  //   }
+  // });
 
   // color countries based on number of cases
   statisticHeatMap(summary);
 
   // map functionality
-  $link.on("mouseenter mousemove mouseleave", function (event) {
+  $link.on("mouseenter mousemove mouseleave", function (e) {
     let path = $(this).children().first("path");
     let index = getIndex(summary, path.attr("id"));
 
     if (index != -1) {
-      if (event.type == "mouseenter") {
+      if (e.type == "mouseenter") {
         path.css("fill", "cyan");
 
         let country = summary[index];
@@ -156,26 +204,30 @@ function displayStatsPerCountry(summary) {
             $info_box.eq(index).html(`${key}: ${value}`);
           }
         });
-      } else if (event.type == "mousemove") {
+      } else if (e.type == "mousemove") {
         $info_box
           .parents("div")
-          .css({ left: event.pageX - 100, top: event.pageY - 166 });
+          .css({ left: e.pageX - 100, top: e.pageY - 166 });
         $info_box.parents("div").show();
       } else {
         $info_box.parents("div").hide();
         statisticHeatMap(summary);
       }
     }
-
-    $(".options")
-      .children("input")
-      .on("click", () => statisticHeatMap(summary));
   });
+
+  $(".options")
+    .children("input")
+    .on("click", () => statisticHeatMap(summary));
+
+  $continents
+    .children("input[type='checkbox']")
+    .on("change", () => displayContinents(summary));
 }
 
 $.ajax({
   type: "GET",
-  url: "https://disease.sh/v3/covid-19/countries",
+  url: "https://disease.sh/v3/covid-19/countries?yesterday=false",
   success: (data) => displayStatsPerCountry(data),
 });
 
@@ -203,7 +255,7 @@ const NUM_FRAMES = 2,
     .split(" ")
     .map((c) => parseInt(c)),
   VIEW_MAX_DIM = VIEW_BOX.slice(2),
-  VIEW_MIN_DIM = 100;
+  VIEW_MIN_DIM = window.innerWidth * 0.2;
 
 let requestID = null,
   frame = 0,
@@ -263,10 +315,12 @@ $("button, document").on("click keydown", (e) => {
     if (nav.act === "zoom") {
       if (
         (nav.dir === -1 && VIEW_BOX[2] >= VIEW_MAX_DIM[0]) ||
-        (nav.dir === 1 && VIEW_BOX[2] <= VIEW_MIN_DIM)
+        (nav.dir === 1 && VIEW_BOX[2] < VIEW_MIN_DIM)
       ) {
-        if (nav.dir === -1 && VIEW_BOX[2] >= VIEW_MAX_DIM[0])
+        if (nav.dir === -1 && VIEW_BOX[2] >= VIEW_MAX_DIM[0]) {
           $(".move").css("visibility", "hidden");
+          SVG.setAttribute("viewBox", `80 60 ${VIEW_BOX[2]} ${VIEW_BOX[3]}`);
+        }
         return;
       }
 
