@@ -12,8 +12,9 @@ body {
 .svg-container {
   display: block;
   width: 80%;
+  height: 75%;
 
-  border: 1px dashed black;
+  /* border: 1px dashed black; */
   background: rgba(0, 0, 0, 0.2);
   padding: 0;
 
@@ -81,15 +82,6 @@ body {
   background: rgb(235, 152, 78);
 }
 
-.graphs {
-  width: 80%;
-  background: rgba(0, 0, 0, 0.6);
-  color: white;
-  position: absolute;
-  top: 95%;
-  left: 10%;
-}
-
 .info-box {
   display: none;
   position: absolute;
@@ -137,7 +129,7 @@ path:hover {
   display: block;
   text-align: center;
   position: absolute;
-  top: 20%;
+  top: 25%;
   right: 2.5%;
   z-index: 2;
   float: left;
@@ -279,7 +271,7 @@ input:checked + .slider:before {
   display: flex;
   flex-direction: column;
   position: absolute;
-  top: 45%;
+  top: 50%;
   right: 4.5%;
   text-align: center;
   font-size: 0.9rem;
@@ -300,4 +292,26 @@ input:checked + .slider:before {
   justify-content: center;
   align-items: center;
   font-weight: bold;
+}
+
+.graphs {
+  display: flex;
+  justify-content: safe;
+  align-content: center;
+  flex-direction: row;
+  width: 80%;
+  padding: 20px;
+  position: absolute;
+  top: 95%;
+  left: 10%;
+  border: none;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.graphs #local_graph {
+  margin: 0 5px 0 0;
+}
+
+.graphs #global_graph {
+  margin: 0 0 0 5px;
 }

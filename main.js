@@ -296,6 +296,117 @@ $.ajax({
   success: (data) => displayStatsPerCountry(data),
 });
 
+$.ajax({
+  type: "GET",
+  url: "https://disease.sh/v3/covid-19/historical?lastdays=all",
+  success: (summary) => plotHistory(summary, true),
+});
+
+$.ajax({
+  type: "GET",
+  url: "https://disease.sh/v3/covid-19/historical/all?lastdays=all",
+  success: (summary) => plotHistory(summary, false),
+});
+
+function plotHistory(summary, local) {
+  var trace1 = {
+    x: local
+      ? Object.keys(summary[0].timeline.cases)
+      : Object.keys(summary.cases),
+    y: local
+      ? Object.values(summary[0].timeline.cases)
+      : Object.values(summary.cases),
+    type: "scatter",
+    name: "cases",
+  };
+
+  var trace2 = {
+    x: local
+      ? Object.keys(summary[0].timeline.deaths)
+      : Object.keys(summary.deaths),
+    y: local
+      ? Object.values(summary[0].timeline.deaths)
+      : Object.values(summary.deaths),
+    type: "scatter",
+    name: "deaths",
+  };
+
+  var trace3 = {
+    x: local
+      ? Object.keys(summary[0].timeline.recovered)
+      : Object.keys(summary.recovered),
+    y: local
+      ? Object.values(summary[0].timeline.recovered)
+      : Object.values(summary.recovered),
+    type: "scatter",
+    name: "recovered",
+  };
+
+  if (local) {
+    var dropdown = [];
+    let prev_label = null;
+    for (var i = 0; i < 231; i++) {
+      if (
+        prev_label != summary[i].country &&
+        summary[i].country != "MS Zaandam"
+      )
+        dropdown.push({
+          method: "update",
+          args: [{ "title.text": `<b>${summary[i].country}</b>` }],
+          label: summary[i].country,
+        });
+      prev_label = summary[i].country;
+    }
+
+    dropdown.sort();
+  }
+
+  var layout = {
+    title: {
+      text: local ? `<b>${summary[0].country}</b>` : "<b>Global</b>",
+      font: {
+        family: "Times New Roman, monospace",
+        size: 24,
+      },
+      xref: "paper",
+      x: 0.5,
+    },
+    xaxis: {
+      title: {
+        text: "<b>Date</b>",
+        font: {
+          family: "Times New Roman, monospace",
+          size: 18,
+        },
+      },
+    },
+    yaxis: {
+      title: {
+        text: "<b>Number of Occurances</b>",
+        font: {
+          family: "Times New Roman, monospace",
+          size: 18,
+        },
+      },
+    },
+
+    updatemenus: local
+      ? [
+          {
+            y: 1.5,
+            yanchor: "top",
+            buttons: dropdown,
+          },
+        ]
+      : [],
+  };
+
+  var data = [trace1, trace2, trace3];
+
+  let plot_id = local ? "local_graph" : "global_graph";
+  Plotly.newPlot(plot_id, data, layout);
+}
+
 const NUM_FRAMES = 2,
   NAV_MAP = {
     0: { dir: 1, act: "zoom", name: "in" },
