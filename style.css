@@ -31,38 +31,54 @@ body {
 
 .global-info:not(#update-time) {
   width: 80%;
-  height: 18%;
+  height: 20%;
 
   background: rgba(0, 0, 0, 0.6);
   color: white;
 
   position: absolute;
-  top: 1%;
+  top: 0;
   left: 10%;
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
   align-items: center;
 }
 
 .global-info p {
-  padding: 3px;
+  padding: 10px 3px;
   background: white;
   color: black;
   font-weight: bold;
   border: 1px solid black;
-  margin: 10px 0;
+  margin: 3px 50px;
+  border-radius: 15px 0 15px 0;
 }
 
 .global-info #update-time {
   position: absolute;
-  bottom: 0;
-  padding: 5px 0;
+  bottom: 2px;
   text-align: center;
   width: 100%;
 }
 
 .global-info span {
   font-weight: normal;
+}
+
+#total p {
+  background: rgb(236, 112, 99);
+}
+
+#new p {
+  background: rgb(88, 214, 141);
+}
+
+#active-critical p {
+  background: rgb(93, 173, 226);
+}
+
+#population p {
+  background: rgb(235, 152, 78);
 }
 
 .graphs {
@@ -89,12 +105,11 @@ body {
 .info-box ul {
   position: relative;
   background: rgba(0, 0, 0, 0.9);
-  width: 200px;
   border-radius: 5%;
   border: 1px solid green;
   margin: 0 auto;
   padding: 5px;
-  z-index: 2;
+  z-index: 3;
 }
 
 .info-box ul::after {
@@ -122,16 +137,24 @@ path:hover {
   display: block;
   text-align: center;
   position: absolute;
-  top: 45%;
-  right: 0.25%;
+  top: 20%;
+  right: 2.5%;
   z-index: 2;
   float: left;
   position: absolute;
+  font-weight: bold;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 25px;
+  padding: 10px;
 }
 
-.move {
-  visibility: hidden;
+.buttons label {
+  color: cyan;
 }
+
+/* .move {
+  visibility: hidden;
+} */
 
 button {
   padding: 5px;
@@ -144,32 +167,38 @@ button {
   margin: 1px;
 }
 
-label {
-  color: black;
-  font-size: 1.2em;
-}
-
 .options {
   position: absolute;
-  top: 40%;
-  left: 10px;
+  top: 5px;
+  right: 13.5%;
   z-index: 2;
+}
+
+.options label {
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.options input {
+  cursor: pointer;
+  margin: 5px 0;
 }
 
 .user-control {
   display: flex;
   flex-direction: column;
   position: absolute;
-  top: 50%;
-  left: 10px;
+  top: 10%;
+  right: 18%;
 }
 
 .switch {
   position: relative;
   display: inline-block;
-  width: 48px;
-  height: 22px;
-  margin: 5px 0;
+  width: 40px;
+  height: 16px;
+  margin: 3px 0;
 }
 
 /* origin checkbox */
@@ -191,8 +220,8 @@ label {
 .slider:before {
   position: absolute;
   content: "";
-  height: 20px;
-  width: 20px;
+  height: 14px;
+  width: 14px;
   left: 1px;
   bottom: 1px;
   background-color: white;
@@ -221,33 +250,37 @@ input:checked + .slider:before {
 }
 
 .switch p {
-  color: black;
+  color: white;
   position: absolute;
   top: 0;
   left: 120%;
-  font-size: 1.25rem;
+  font-size: 1rem;
   padding: 0;
   width: 150px;
+  font-weight: bold;
 }
 
 .continents {
   position: absolute;
-  top: 70%;
-  left: 10px;
+  top: 3%;
+  left: 11%;
 }
 
 .continents label {
   margin: 0;
   padding: 5px;
   letter-spacing: 1px;
+  color: white;
+  font-weight: bold;
+  font-size: 1.1rem;
 }
 
 #colorbar {
   display: flex;
   flex-direction: column;
   position: absolute;
-  top: 35%;
-  right: 6%;
+  top: 45%;
+  right: 4.5%;
   text-align: center;
   font-size: 0.9rem;
   color: black;
@@ -266,4 +299,5 @@ input:checked + .slider:before {
   left: 0;
   justify-content: center;
   align-items: center;
+  font-weight: bold;
 }

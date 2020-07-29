@@ -89,6 +89,8 @@ function addText(summary) {
       "Paraguay",
       "Libyan Arab Jamahiriya",
       "Namibia",
+      "Iceland",
+      "Norway",
     ];
 
     if (
@@ -141,7 +143,7 @@ function convertStringToDateTime(x) {
   return new Date(x).toLocaleString("en-US", { timeZone: "America/Vancouver" });
 }
 
-function displayGlobal(summary) {
+function displayGlobalStatistics(summary) {
   var allowed_values = [
     "cases",
     "deaths",
@@ -152,11 +154,12 @@ function displayGlobal(summary) {
     "active",
     "critical",
     "affectedCountries",
+    "population",
     "updated",
   ];
 
   for (let index in allowed_values) {
-    if (index != allowed_values.length - 1) {
+    if (index < allowed_values.length - 1) {
       html_val = numberWithCommas(summary[allowed_values[index]]);
     } else {
       html_val = convertStringToDateTime(summary[allowed_values[index]]);
@@ -186,6 +189,33 @@ function displayContinents(summary) {
       $(`#text-${path.id}`).hide(); // text
     }
   });
+
+  var stats = {
+    cases: 0,
+    deaths: 0,
+    recovered: 0,
+    todayCases: 0,
+    todayDeaths: 0,
+    todayRecovered: 0,
+    active: 0,
+    critical: 0,
+    affectedCountries: 0,
+    population: 0,
+    updated: 0,
+  };
+
+  $.each(summary, (index, value) => {
+    if (continent_included.includes(value.continent)) {
+      $.each(stats, (pos) => {
+        stats[pos] += value[pos];
+      });
+    }
+  });
+
+  stats["affectedCountries"] = country_names.length;
+  stats["updated"] = $("#update-time span").html();
+
+  displayGlobalStatistics(stats);
 }
 
 function displayStatsPerCountry(summary) {
@@ -217,6 +247,7 @@ function displayStatsPerCountry(summary) {
           { "Total Deaths": country.deaths },
           { "New Recovered": country.todayRecovered },
           { "Total Recovered": country.recovered },
+          { Population: country.population },
         ];
 
         $.each($info_box, (index) => {
@@ -226,18 +257,21 @@ function displayStatsPerCountry(summary) {
           if (index == 0) {
             $info_box.eq(index).html(`${value[0]} (${value[1]})`);
           } else {
-            $info_box.eq(index).html(`${key}: ${value}`);
+            $info_box.eq(index).html(`${key}: ${numberWithCommas(value)}`);
           }
         });
       } else if (e.type == "mousemove") {
-        $info_box
-          .parents("div")
-          .css({ left: e.pageX - 100, top: e.pageY - 166 });
+        $info_box.parents("div").css({
+          left: e.pageX - $info_box.outerWidth() / 2 - 6,
+          top: e.pageY - 186,
+        });
         $info_box.parents("div").show();
       } else {
         $info_box.parents("div").hide();
         statisticHeatMap(summary);
       }
+    } else {
+      $(this).hide();
     }
   });
 
@@ -253,7 +287,7 @@ function displayStatsPerCountry(summary) {
 $.ajax({
   type: "GET",
   url: "https://disease.sh/v3/covid-19/all?yesterday=false",
-  success: (data) => displayGlobal(data),
+  success: (data) => displayGlobalStatistics(data),
 });
 
 $.ajax({
@@ -349,13 +383,13 @@ $("button, document").on("click keydown", (e) => {
         (nav.dir === 1 && VIEW_BOX[2] < VIEW_MIN_DIM)
       ) {
         if (nav.dir === -1 && VIEW_BOX[2] >= VIEW_MAX_DIM[0]) {
-          $(".move").css("visibility", "hidden");
+          // $(".move").css("visibility", "hidden");
           SVG.setAttribute("viewBox", `80 60 ${VIEW_BOX[2]} ${VIEW_BOX[3]}`);
         }
         return;
       }
 
-      $(".move").css("visibility", "visible");
+      // $(".move").css("visibility", "visible");
 
       for (let i = 0; i < 2; i++) {
         target[i + 2] = VIEW_BOX[i + 2] / Math.pow(2, nav.dir);
