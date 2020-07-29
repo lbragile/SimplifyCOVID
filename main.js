@@ -76,6 +76,8 @@ function addText(summary) {
       "Czechia",
       "Belgium",
       "Rwanda",
+      "Germany",
+      "Greece",
     ];
     var include_countries = [
       "Greenland",
@@ -87,7 +89,6 @@ function addText(summary) {
       "Paraguay",
       "Libyan Arab Jamahiriya",
       "Namibia",
-      "Gabon",
     ];
 
     if (
@@ -132,6 +133,38 @@ function statisticHeatMap(summary) {
   });
 }
 
+function numberWithCommas(x) {
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+function convertStringToDateTime(x) {
+  return new Date(x).toLocaleString("en-US", { timeZone: "America/Vancouver" });
+}
+
+function displayGlobal(summary) {
+  var allowed_values = [
+    "cases",
+    "deaths",
+    "recovered",
+    "todayCases",
+    "todayDeaths",
+    "todayRecovered",
+    "active",
+    "critical",
+    "affectedCountries",
+    "updated",
+  ];
+
+  for (let index in allowed_values) {
+    if (index != allowed_values.length - 1) {
+      html_val = numberWithCommas(summary[allowed_values[index]]);
+    } else {
+      html_val = convertStringToDateTime(summary[allowed_values[index]]);
+    }
+    $(".global-info").find("span").eq(index).html(html_val);
+  }
+}
+
 function displayContinents(summary) {
   var continent_included = [],
     country_names = [];
@@ -162,14 +195,6 @@ function displayStatsPerCountry(summary) {
 
   // add text to the countries
   addText(summary);
-
-  // TODO
-  // $("#country-name :checkbox").on("change", () => {
-  //   console.log($(this).is(":checked"));
-  //   if ($(this).is(":checked")) {
-  //     addText(summary);
-  //   }
-  // });
 
   // color countries based on number of cases
   statisticHeatMap(summary);
@@ -224,6 +249,12 @@ function displayStatsPerCountry(summary) {
     .children("input[type='checkbox']")
     .on("change", () => displayContinents(summary));
 }
+
+$.ajax({
+  type: "GET",
+  url: "https://disease.sh/v3/covid-19/all?yesterday=false",
+  success: (data) => displayGlobal(data),
+});
 
 $.ajax({
   type: "GET",
@@ -345,4 +376,43 @@ $("button, document").on("click keydown", (e) => {
 
     update();
   }
+});
+
+// color bar
+colors = [
+  "#FF0000",
+  "#FF6666",
+  "#FF8000",
+  "#FFB266",
+  "#FFFF00",
+  "#FFFF66",
+  "#80FF00",
+  "#B2FF66",
+  "#FFF",
+];
+
+text = [
+  "≤100% <br><br> >87.5%",
+  "≤87.5% <br><br> >75.0%",
+  "≤75.0% <br><br> >62.5%",
+  "≤62.5% <br><br> >50.0%",
+  "≤50.0% <br><br> >37.5%",
+  "≤37.5% <br><br> >25.0%",
+  "≤25.0% <br><br> >12.5%",
+  "≤12.5% <br><br> ≥0.00%",
+];
+
+var rect_colors = $("#colorbar").children();
+for (var i = 0; i <= colors.length; i++) {
+  if (i < colors.length) rect_colors.eq(i).css("background", colors[i]);
+  rect_colors.eq(i).html("<p>" + text[i] + "</p>");
+}
+
+// to get the colors
+rect_colors.on("click", function (e) {
+  alert(
+    "This color is: " +
+      $(this).css("background-color") +
+      "\nNote that 100% corresponds to the maximum number reported by a given country and likewise 0% refers to the minimum."
+  );
 });

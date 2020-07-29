@@ -12,12 +12,14 @@ body {
 .svg-container {
   display: block;
   width: 80%;
-  margin: 0 auto;
-  position: relative;
+
   border: 1px dashed black;
   background: rgba(0, 0, 0, 0.2);
   padding: 0;
-  top: 17.5%;
+
+  position: absolute;
+  top: 20%;
+  left: 10%;
 }
 
 .svg-container path {
@@ -25,6 +27,51 @@ body {
   stroke: black;
   stroke-width: 1px;
   stroke-opacity: 0.2;
+}
+
+.global-info:not(#update-time) {
+  width: 80%;
+  height: 18%;
+
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+
+  position: absolute;
+  top: 1%;
+  left: 10%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.global-info p {
+  padding: 3px;
+  background: white;
+  color: black;
+  font-weight: bold;
+  border: 1px solid black;
+  margin: 10px 0;
+}
+
+.global-info #update-time {
+  position: absolute;
+  bottom: 0;
+  padding: 5px 0;
+  text-align: center;
+  width: 100%;
+}
+
+.global-info span {
+  font-weight: normal;
+}
+
+.graphs {
+  width: 80%;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  position: absolute;
+  top: 95%;
+  left: 10%;
 }
 
 .info-box {
@@ -75,11 +122,11 @@ path:hover {
   display: block;
   text-align: center;
   position: absolute;
-  top: 50%;
-  right: 35px;
+  top: 45%;
+  right: 0.25%;
   z-index: 2;
   float: left;
-  position: fixed;
+  position: absolute;
 }
 
 .move {
@@ -103,7 +150,7 @@ label {
 }
 
 .options {
-  position: fixed;
+  position: absolute;
   top: 40%;
   left: 10px;
   z-index: 2;
@@ -112,7 +159,7 @@ label {
 .user-control {
   display: flex;
   flex-direction: column;
-  position: fixed;
+  position: absolute;
   top: 50%;
   left: 10px;
 }
@@ -184,7 +231,7 @@ input:checked + .slider:before {
 }
 
 .continents {
-  position: fixed;
+  position: absolute;
   top: 70%;
   left: 10px;
 }
@@ -193,4 +240,30 @@ input:checked + .slider:before {
   margin: 0;
   padding: 5px;
   letter-spacing: 1px;
+}
+
+#colorbar {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 35%;
+  right: 6%;
+  text-align: center;
+  font-size: 0.9rem;
+  color: black;
+}
+
+#colorbar div {
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  position: relative;
+}
+
+#colorbar p {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  justify-content: center;
+  align-items: center;
 }
