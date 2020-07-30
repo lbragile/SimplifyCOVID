@@ -5,7 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>COVID Statistics</title>
     <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css"
+    />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
   </head>
   <body>
     <div class="global-info">
@@ -119,6 +124,31 @@
       <div id="local_graph"></div>
       <div id="global_graph"></div>
     </section>
+
+    <div class="table-position">
+      <table class="table-info">
+        <thead>
+          <tr>
+            <th>Country</th>
+            <th>Total Cases</th>
+            <th>New Cases</th>
+            <th>Total Deaths</th>
+            <th>New Deaths</th>
+            <th>Total Recovered</th>
+            <th>New Recovered</th>
+            <th>Active</th>
+            <th>Critical</th>
+            <th>Cases Per Million</th>
+            <th>Deaths Per Million</th>
+            <th>Recovered Per Million</th>
+            <th>Active Per Million</th>
+            <th>Critical Per Million</th>
+            <th>Population</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
     <!-- <div class="dropdown">
       Country: <br />
       <select class="countrydata"> </select>
@@ -147,7 +177,7 @@
     </form>
 
     <!-- svg map -->
-    <div class="svg-container">
+    <div class="map-container">
       <svg id="svg-map" viewBox="80 60 1920 880">
         <a>
           <path

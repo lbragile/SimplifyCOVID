@@ -167,6 +167,42 @@ function displayGlobalStatistics(summary) {
     }
     $(".global-info").find("span").eq(index).html(html_val);
   }
+
+  addTableRow(summary);
+}
+
+function addTableRow(summary) {
+  var summary_vals = Object.values(summary);
+  var table_row_string;
+
+  if (/\d/.test(summary_vals[0])) {
+    table_row_string = "<td>Global</td><br/>";
+  } else {
+    table_row_string = `<td>${summary_vals[0]}</td><br/>`;
+  }
+
+  summary_vals.forEach((element, index) => {
+    if (index > 0 && index <= 8) {
+      table_row_string += `<td> ${numberWithCommas(element)} </td><br/>`;
+    }
+  });
+
+  // per million
+  let population = summary_vals[13];
+  for (let i = 1; i <= 9; i += 2) {
+    if (i == 9) {
+      i--;
+    }
+    table_row_string += `<td> ${numberWithCommas(
+      ((summary_vals[i] * 1000000) / population).toFixed(2)
+    )} </td><br/>`;
+  }
+
+  // population and affected countries
+  table_row_string += `<td> ${numberWithCommas(population)} </td><br/>`;
+
+  table_row_string = `<tr> ${table_row_string} </tr>`;
+  $(".table-info tbody").append(table_row_string);
 }
 
 function displayContinents(summary) {
@@ -229,6 +265,40 @@ function displayStatsPerCountry(summary) {
 
   // color countries based on number of cases
   statisticHeatMap(summary);
+
+  $.each(summary, (index, value) => {
+    // Table row statistics
+    let sub_json = {
+      updated: value.country,
+      cases: value.cases,
+      todayCases: value.todayCases,
+      deaths: value.deaths,
+      todayDeaths: value.todayDeaths,
+      recovered: value.recovered,
+      todayRecovered: value.todayRecovered,
+      active: value.active,
+      critical: value.critical,
+      casesPerOneMillion: 0,
+      deathsPerOneMillion: 0,
+      tests: 0,
+      testsPerOneMillion: 0,
+      population: value.population,
+      oneCasePerPeople: 0,
+      oneDeathPerPeople: 0,
+      oneTestPerPeople: 0,
+      activePerOneMillion: 0,
+      recoveredPerOneMillion: 0,
+      criticalPerOneMillion: 0,
+      affectedCountries: 213,
+    };
+    addTableRow(sub_json);
+  });
+
+  // make the table with DataTables plugin
+  $(".table-info").DataTable({
+    responsive: true,
+    pageLength: 10,
+  });
 
   // map functionality
   $link.on("mouseenter mousemove mouseleave", function (e) {
@@ -414,7 +484,7 @@ function plotData(summary, local, index) {
 
   var layout = {
     title: {
-      text: local ? `<b>${summary[index].country}</b>` : "<b>Global</b>",
+      text: local ? `<b>${summary[index].country}</b>` : "<b>Global</br>",
       font: {
         family: "Times New Roman, monospace",
         size: 24,
