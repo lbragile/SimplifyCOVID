@@ -315,3 +315,16 @@ input:checked + .slider:before {
 .graphs #global_graph {
   margin: 0 0 0 5px;
 }
+
+/* .dropdown {
+  position: absolute;
+  top: 95%;
+  left: 10%;
+  padding: 5px 0 0 5px;
+  color: white;
+  font-weight: bold;
+}
+
+.dropdown select {
+  width: 35%;
+} */

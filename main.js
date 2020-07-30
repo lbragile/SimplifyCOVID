@@ -78,6 +78,7 @@ function addText(summary) {
       "Rwanda",
       "Germany",
       "Greece",
+      "Libyan Arab Jamahiriya",
     ];
     var include_countries = [
       "Greenland",
@@ -87,7 +88,7 @@ function addText(summary) {
       "Papua New Guinea",
       "Uruguay",
       "Paraguay",
-      "Libyan Arab Jamahiriya",
+      // "Libyan Arab Jamahiriya",
       "Namibia",
       "Iceland",
       "Norway",
@@ -282,6 +283,30 @@ function displayStatsPerCountry(summary) {
   $continents
     .children("input[type='checkbox']")
     .on("change", () => displayContinents(summary));
+
+  var countries_string = "";
+  var countries = [];
+  $.each(summary, (index, value) => {
+    countries_string += value.country + "%2C%20";
+    countries.push(value.country);
+  });
+
+  // local
+  $.ajax({
+    type: "GET",
+    url:
+      "https://disease.sh/v3/covid-19/historical/" +
+      countries_string +
+      "?lastdays=all",
+    success: (summary) => plotHistory(summary, countries, true),
+  });
+
+  // global
+  $.ajax({
+    type: "GET",
+    url: "https://disease.sh/v3/covid-19/historical/all?lastdays=all",
+    success: (summary) => plotHistory(summary, countries, false),
+  });
 }
 
 $.ajax({
@@ -296,25 +321,70 @@ $.ajax({
   success: (data) => displayStatsPerCountry(data),
 });
 
-$.ajax({
-  type: "GET",
-  url: "https://disease.sh/v3/covid-19/historical?lastdays=all",
-  success: (summary) => plotHistory(summary, true),
-});
+function plotHistory(summary, countries, local) {
+  var not_available_countries = [
+    "Greenland",
+    "Faroe Islands",
+    "Falkland Islands (Malvinas)",
+    "Réunion",
+    "New Caledonia",
+  ];
 
-$.ajax({
-  type: "GET",
-  url: "https://disease.sh/v3/covid-19/historical/all?lastdays=all",
-  success: (summary) => plotHistory(summary, false),
-});
+  // // clear the list
+  // $(".countrydata").html("");
+  // countries.forEach((element, index) => {
+  //   if (!not_available_countries.includes(element)) {
+  //     let option = new Option(element, index);
+  //     $(option).html(element);
+  //     $(".countrydata").append(option);
+  //   }
+  // });
 
-function plotHistory(summary, local) {
+  plotData(summary, local, 0); // default plot
+
+  // $(".countrydata").on("change", () => {
+  //   let option_index = $(".countrydata option:selected").index();
+  //   plotData(summary, local, option_index);
+  // });
+
+  if (local) {
+    $(document).on("click", "path", function () {
+      $(this).animate(
+        {
+          opacity: 0.25,
+          "stroke-width": "10px",
+        },
+        2000,
+        "linear"
+      );
+
+      $(this).animate(
+        {
+          opacity: 1,
+          "stroke-width": "1px",
+        },
+        1000,
+        "linear"
+      );
+
+      if (not_available_countries.includes($(this).attr("data-name"))) {
+        alert(`${$(this).attr("data-name")} doesn't have any historical data`);
+        return;
+      } else {
+        let option_index = countries.indexOf($(this).attr("data-name"));
+        plotData(summary, local, option_index);
+      }
+    });
+  }
+}
+
+function plotData(summary, local, index) {
   var trace1 = {
     x: local
-      ? Object.keys(summary[0].timeline.cases)
+      ? Object.keys(summary[index].timeline.cases)
       : Object.keys(summary.cases),
     y: local
-      ? Object.values(summary[0].timeline.cases)
+      ? Object.values(summary[index].timeline.cases)
       : Object.values(summary.cases),
     type: "scatter",
     name: "cases",
@@ -322,10 +392,10 @@ function plotHistory(summary, local) {
 
   var trace2 = {
     x: local
-      ? Object.keys(summary[0].timeline.deaths)
+      ? Object.keys(summary[index].timeline.deaths)
       : Object.keys(summary.deaths),
     y: local
-      ? Object.values(summary[0].timeline.deaths)
+      ? Object.values(summary[index].timeline.deaths)
       : Object.values(summary.deaths),
     type: "scatter",
     name: "deaths",
@@ -333,37 +403,18 @@ function plotHistory(summary, local) {
 
   var trace3 = {
     x: local
-      ? Object.keys(summary[0].timeline.recovered)
+      ? Object.keys(summary[index].timeline.recovered)
       : Object.keys(summary.recovered),
     y: local
-      ? Object.values(summary[0].timeline.recovered)
+      ? Object.values(summary[index].timeline.recovered)
       : Object.values(summary.recovered),
     type: "scatter",
     name: "recovered",
   };
 
-  if (local) {
-    var dropdown = [];
-    let prev_label = null;
-    for (var i = 0; i < 231; i++) {
-      if (
-        prev_label != summary[i].country &&
-        summary[i].country != "MS Zaandam"
-      )
-        dropdown.push({
-          method: "update",
-          args: [{ "title.text": `<b>${summary[i].country}</b>` }],
-          label: summary[i].country,
-        });
-      prev_label = summary[i].country;
-    }
-
-    dropdown.sort();
-  }
-
   var layout = {
     title: {
-      text: local ? `<b>${summary[0].country}</b>` : "<b>Global</b>",
+      text: local ? `<b>${summary[index].country}</b>` : "<b>Global</b>",
       font: {
         family: "Times New Roman, monospace",
         size: 24,
@@ -389,16 +440,6 @@ function plotHistory(summary, local) {
         },
       },
     },
-
-    updatemenus: local
-      ? [
-          {
-            y: 1.5,
-            yanchor: "top",
-            buttons: dropdown,
-          },
-        ]
-      : [],
   };
 
   var data = [trace1, trace2, trace3];
@@ -509,8 +550,7 @@ $("button, document").on("click keydown", (e) => {
     } else if (nav.act === "move") {
       if (
         (nav.dir === -1 && VIEW_BOX[nav.axis] <= 0) ||
-        (nav.dir === 1 &&
-          VIEW_BOX[nav.axis] >= VIEW_MAX_DIM[nav.axis] - VIEW_BOX[2 + nav.axis])
+        (nav.dir === 1 && VIEW_BOX[nav.axis] >= VIEW_MAX_DIM[nav.axis])
       ) {
         return;
       }
