@@ -112,9 +112,6 @@ function writeText(p) {
     "translate(" + (b.x + b.width / 2) + " " + (b.y + b.height / 2) + ")"
   );
   t.textContent = p.getAttribute("data-name");
-  t.setAttribute("fill", "black");
-  t.setAttribute("font-size", "14");
-  t.setAttribute("font-weight", "bolder");
   t.setAttribute("id", "text-" + p.getAttribute("id"));
 
   p.parentNode.insertBefore(t, p.nextSibling);
@@ -137,7 +134,9 @@ function statisticHeatMap(summary) {
 }
 
 function numberWithCommas(x) {
-  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  if (x != undefined) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
 }
 
 function convertStringToDateTime(x) {
@@ -208,7 +207,7 @@ function addTableRow(summary) {
 function displayContinents(summary) {
   var continent_included = [],
     country_names = [];
-  $.each($continents.find("input"), (index, value) => {
+  $.each($continents.children().find("input"), (index, value) => {
     if ($(value).is(":checked")) continent_included.push($(value).attr("name"));
   });
 
@@ -296,8 +295,9 @@ function displayStatsPerCountry(summary) {
 
   // make the table with DataTables plugin
   $(".table-info").DataTable({
-    responsive: true,
+    // responsive: true,
     pageLength: 10,
+    scrollX: true,
   });
 
   // map functionality
@@ -351,6 +351,7 @@ function displayStatsPerCountry(summary) {
     .on("click", () => statisticHeatMap(summary));
 
   $continents
+    .children()
     .children("input[type='checkbox']")
     .on("change", () => displayContinents(summary));
 

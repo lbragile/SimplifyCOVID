@@ -9,31 +9,33 @@
       rel="stylesheet"
       href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css"
     />
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.datatables.net/responsive/2.2.5/css/responsive.dataTables.min.css"
+    />
   </head>
   <body>
     <div class="global-info">
       <div id="total">
-        <p>Total Cases: <span></span></p>
-        <p>Total Deaths: <span></span></p>
-        <p>Total Recovered: <span></span></p>
+        <p>Total Cases: <br /><span></span></p>
+        <p>Total Deaths: <br /><span></span></p>
+        <p>Total Recovered: <br /><span></span></p>
       </div>
 
       <div id="new">
-        <p>New Cases: <span>a</span></p>
-        <p>New Deaths: <span></span></p>
-        <p>New Recovered: <span></span></p>
+        <p>New Cases: <br /><span>a</span></p>
+        <p>New Deaths: <br /><span></span></p>
+        <p>New Recovered: <br /><span></span></p>
       </div>
 
       <div id="active-critical">
-        <p>Active: <span></span></p>
-        <p>Critical: <span></span></p>
+        <p>Active: <br /><span></span></p>
+        <p>Critical: <br /><span></span></p>
       </div>
 
       <div id="population">
-        <p>Affected Countries: <span></span></p>
-        <p>Population: <span></span></p>
+        <p>Affected Countries: <br /><span></span></p>
+        <p>Population: <br /><span></span></p>
       </div>
 
       <div id="update-time">Last Updated: <span></span></div>
@@ -78,24 +80,6 @@
       <label class="switch">
         <input type="checkbox" checked />
         <span class="slider round"></span>
-        <p>Today</p>
-      </label>
-
-      <label class="switch">
-        <input type="checkbox" />
-        <span class="slider round"></span>
-        <p>Cases / Mil.</p>
-      </label>
-
-      <label class="switch">
-        <input type="checkbox" />
-        <span class="slider round"></span>
-        <p>People / Case</p>
-      </label>
-
-      <label class="switch">
-        <input type="checkbox" />
-        <span class="slider round"></span>
         <p>Country Name</p>
       </label>
     </div>
@@ -126,7 +110,7 @@
     </section>
 
     <div class="table-position">
-      <table class="table-info">
+      <table class="table-info" style="width: 100%;">
         <thead>
           <tr>
             <th>Country</th>
@@ -157,23 +141,37 @@
     <form class="continents" action="" method="">
       <!-- <input type="checkbox" name="All" id="All" checked />
       <label for="All"> All</label><br /> -->
-      <input type="checkbox" name="Europe" id="Europe" checked />
-      <label for="Europe"> Europe</label><br />
-      <input type="checkbox" name="North America" id="North America" checked />
-      <label for="North America"> North America</label><br />
-      <input type="checkbox" name="South America" id="South America" checked />
-      <label for="South America"> South America</label><br />
-      <input type="checkbox" name="Asia" id="Asia" checked />
-      <label for="Asia"> Asia</label><br />
-      <input type="checkbox" name="Africa" id="Africa" checked />
-      <label for="Africa"> Africa</label><br />
-      <input
-        type="checkbox"
-        name="Australia/Oceania"
-        id="Australia/Oceania"
-        checked
-      />
-      <label for="Australia/Oceania"> Australia/Oceania</label><br />
+      <div class="first_continents">
+        <input type="checkbox" name="Europe" id="Europe" checked />
+        <label for="Europe"> Europe</label><br />
+        <input
+          type="checkbox"
+          name="North America"
+          id="North America"
+          checked
+        />
+        <label for="North America"> North America</label><br />
+        <input
+          type="checkbox"
+          name="South America"
+          id="South America"
+          checked
+        />
+        <label for="South America"> South America</label><br />
+      </div>
+      <div class="second-continents">
+        <input type="checkbox" name="Asia" id="Asia" checked />
+        <label for="Asia"> Asia</label><br />
+        <input type="checkbox" name="Africa" id="Africa" checked />
+        <label for="Africa"> Africa</label><br />
+        <input
+          type="checkbox"
+          name="Australia/Oceania"
+          id="Australia/Oceania"
+          checked
+        />
+        <label for="Australia/Oceania"> Australia/Oceania</label><br />
+      </div>
     </form>
 
     <!-- svg map -->
@@ -1681,6 +1679,23 @@
       </svg>
     </div>
 
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=UA-174176007-1"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "UA-174176007-1");
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.5/js/dataTables.responsive.min.js"></script>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="./main.js"></script>
   </body>
