@@ -4,6 +4,19 @@ var $info_box = $(".info-box li");
 var $input = $("#scaling");
 var $continents = $(".continents");
 
+// color bar
+var colors = [
+  "#FF0000",
+  "#FF6666",
+  "#FF8000",
+  "#FFB266",
+  "#FFFF00",
+  "#FFFF66",
+  "#80FF00",
+  "#B2FF66",
+  "#FFF",
+];
+
 function caseHeatMap(summary, type) {
   var country_cases = [];
   $.each(summary, function (index, item) {
@@ -35,21 +48,21 @@ function caseHeatMap(summary, type) {
   $.each($paths, function (_, path) {
     let index = getIndex(summary, path.getAttribute("id"));
     if (country_cases[index] > p875_cases) {
-      path.style.fill = "#FF0000";
+      path.style.fill = colors[0];
     } else if (country_cases[index] > p75_cases) {
-      path.style.fill = "#FF6666";
+      path.style.fill = colors[1];
     } else if (country_cases[index] > p625_cases) {
-      path.style.fill = "#FF8000";
+      path.style.fill = colors[2];
     } else if (country_cases[index] > p50_cases) {
-      path.style.fill = "#FFB266";
+      path.style.fill = colors[3];
     } else if (country_cases[index] > p375_cases) {
-      path.style.fill = "#FFFF00";
+      path.style.fill = colors[4];
     } else if (country_cases[index] > p25_cases) {
-      path.style.fill = "#FFFF66";
+      path.style.fill = colors[5];
     } else if (country_cases[index] > p125_cases) {
-      path.style.fill = "#80FF00";
+      path.style.fill = colors[6];
     } else {
-      path.style.fill = "#B2FF66";
+      path.style.fill = colors[7];
     }
   });
 }
@@ -261,6 +274,14 @@ function displayStatsPerCountry(summary) {
 
   // add text to the countries
   addText(summary);
+
+  $("#country-switch").on("change", function () {
+    if ($(this).is(":checked")) {
+      addText(summary);
+    } else {
+      $("#svg-map text").hide();
+    }
+  });
 
   // color countries based on number of cases
   statisticHeatMap(summary);
@@ -519,135 +540,7 @@ function plotData(summary, local, index) {
   Plotly.newPlot(plot_id, data, layout);
 }
 
-const NUM_FRAMES = 2,
-  NAV_MAP = {
-    0: { dir: 1, act: "zoom", name: "in" },
-    107: { dir: 1, act: "zoom", name: "in" }, // numpad
-    187: { dir: 1, act: "zoom", name: "in" }, // near backspace
-
-    1: { dir: -1, act: "zoom", name: "out" },
-    109: { dir: -1, act: "zoom", name: "out" }, // numpad
-    189: { dir: -1, act: "zoom", name: "out" }, // near backspace
-
-    2: { dir: -1, act: "move", name: "up", axis: 1 },
-    38: { dir: -1, act: "move", name: "up", axis: 1 },
-    3: { dir: -1, act: "move", name: "left", axis: 0 },
-    37: { dir: -1, act: "move", name: "left", axis: 0 },
-    4: { dir: 1, act: "move", name: "down", axis: 1 },
-    40: { dir: 1, act: "move", name: "down", axis: 1 },
-    5: { dir: 1, act: "move", name: "right", axis: 0 },
-    39: { dir: 1, act: "move", name: "right", axis: 0 },
-  },
-  SVG = document.querySelector("svg"),
-  VIEW_BOX = SVG.getAttribute("viewBox")
-    .split(" ")
-    .map((c) => parseInt(c)),
-  VIEW_MAX_DIM = VIEW_BOX.slice(2),
-  VIEW_MIN_DIM = window.innerWidth * 0.2;
-
-let requestID = null,
-  frame = 0,
-  nav = {},
-  target = Array(4);
-
-function update() {
-  let k = ++frame / NUM_FRAMES,
-    j = 1 - k,
-    current_viewbox = VIEW_BOX.slice();
-
-  if (nav.act === "zoom") {
-    for (let i = 0; i < 4; i++)
-      current_viewbox[i] = j * VIEW_BOX[i] + k * target[i];
-  }
-
-  if (nav.act === "move")
-    current_viewbox[nav.axis] = j * VIEW_BOX[nav.axis] + k * target[nav.axis];
-
-  SVG.setAttribute("viewBox", current_viewbox.join(" "));
-
-  if (!(frame % NUM_FRAMES)) {
-    frame = 0;
-    VIEW_BOX.splice(0, 4, ...current_viewbox);
-    nav = {};
-    target = Array(4);
-    cancelAnimationFrame(requestID);
-    requestID = null;
-    return;
-  }
-
-  requestID = requestAnimationFrame(update);
-}
-
-$("button").on("mouseover", () => {
-  $("button").css("cursor", "pointer");
-});
-
-$("button, document").on("click keydown", (e) => {
-  e.preventDefault(); // when pressing arrow keys, this prevents the scroll bar from being activated
-
-  if (
-    !requestID &&
-    (e.which == 1 ||
-      (37 <= e.keyCode && e.keyCode <= 40) ||
-      e.keyCode == 107 ||
-      e.keyCode == 109 ||
-      e.keyCode == 187 ||
-      e.keyCode == 189)
-  ) {
-    if (e.which == 1) {
-      nav = NAV_MAP[parseInt(e.target.id)];
-    } else {
-      nav = NAV_MAP[parseInt(e.keyCode)];
-    }
-
-    if (nav.act === "zoom") {
-      if (
-        (nav.dir === -1 && VIEW_BOX[2] >= VIEW_MAX_DIM[0]) ||
-        (nav.dir === 1 && VIEW_BOX[2] < VIEW_MIN_DIM)
-      ) {
-        if (nav.dir === -1 && VIEW_BOX[2] >= VIEW_MAX_DIM[0]) {
-          // $(".move").css("visibility", "hidden");
-          SVG.setAttribute("viewBox", `80 60 ${VIEW_BOX[2]} ${VIEW_BOX[3]}`);
-        }
-        return;
-      }
-
-      // $(".move").css("visibility", "visible");
-
-      for (let i = 0; i < 2; i++) {
-        target[i + 2] = VIEW_BOX[i + 2] / Math.pow(2, nav.dir);
-        target[i] = 0.5 * (VIEW_MAX_DIM[i] - target[i + 2]);
-      }
-    } else if (nav.act === "move") {
-      if (
-        (nav.dir === -1 && VIEW_BOX[nav.axis] <= 0) ||
-        (nav.dir === 1 && VIEW_BOX[nav.axis] >= VIEW_MAX_DIM[nav.axis])
-      ) {
-        return;
-      }
-
-      target[nav.axis] =
-        VIEW_BOX[nav.axis] + 0.5 * nav.dir * VIEW_BOX[2 + nav.axis];
-    }
-
-    update();
-  }
-});
-
-// color bar
-colors = [
-  "#FF0000",
-  "#FF6666",
-  "#FF8000",
-  "#FFB266",
-  "#FFFF00",
-  "#FFFF66",
-  "#80FF00",
-  "#B2FF66",
-  "#FFF",
-];
-
-text = [
+var text = [
   "≤100% <br><br> >87.5%",
   "≤87.5% <br><br> >75.0%",
   "≤75.0% <br><br> >62.5%",
@@ -660,15 +553,150 @@ text = [
 
 var rect_colors = $("#colorbar").children();
 for (var i = 0; i <= colors.length; i++) {
-  if (i < colors.length) rect_colors.eq(i).css("background", colors[i]);
+  if (i < colors.length) {
+    rect_colors.eq(i).css("background", colors[i]);
+  }
+
   rect_colors.eq(i).html("<p>" + text[i] + "</p>");
 }
 
-// to get the colors
-rect_colors.on("click", function (e) {
-  alert(
-    "This color is: " +
-      $(this).css("background-color") +
-      "\nNote that 100% corresponds to the maximum number reported by a given country and likewise 0% refers to the minimum."
-  );
+// // to get the colors
+// rect_colors.on("click", function (e) {
+//   alert(
+//     "This color is: " +
+//       $(this).css("background-color") +
+//       "\nNote that 100% corresponds to the maximum number reported by a given country and likewise 0% refers to the minimum."
+//   );
+// });
+
+// We select the SVG into the page
+var svg = document.getElementById("svg-map");
+
+// If browser supports pointer events
+if (window.PointerEvent) {
+  svg.addEventListener("pointerdown", onPointerDown); // Pointer is pressed
+  svg.addEventListener("pointerup", onPointerUp); // Releasing the pointer
+  svg.addEventListener("pointerleave", onPointerUp); // Pointer gets out of the SVG area
+  svg.addEventListener("pointermove", onPointerMove); // Pointer is moving
+} else {
+  // Add all mouse events listeners fallback
+  svg.addEventListener("mousedown", onPointerDown); // Pressing the mouse
+  svg.addEventListener("mouseup", onPointerUp); // Releasing the mouse
+  svg.addEventListener("mouseleave", onPointerUp); // Mouse gets out of the SVG area
+  svg.addEventListener("mousemove", onPointerMove); // Mouse is moving
+
+  // Add all touch events listeners fallback
+  svg.addEventListener("touchstart", onPointerDown); // Finger is touching the screen
+  svg.addEventListener("touchend", onPointerUp); // Finger is no longer touching the screen
+  svg.addEventListener("touchmove", onPointerMove); // Finger is moving
+}
+
+// This function returns an object with X & Y values from the pointer event
+function getPointFromEvent(e) {
+  var point = { x: 0, y: 0 };
+  // If event is triggered by a touch event, we get the position of the first finger
+  if (e.targetTouches) {
+    point.x = e.targetTouches[0].clientX;
+    point.y = e.targetTouches[0].clientY;
+  } else {
+    point.x = e.clientX;
+    point.y = e.clientY;
+  }
+
+  return point;
+}
+
+// This variable will be used later for move events to check if pointer is down or not
+var isPointerDown = false;
+
+// This variable will contain the original coordinates when the user start pressing the mouse or touching the screen
+var pointerOrigin = {
+  x: 0,
+  y: 0,
+};
+
+// Function called by the event listeners when user start pressing/touching
+function onPointerDown(event) {
+  isPointerDown = true; // We set the pointer as down
+
+  // We get the pointer position on click/touchdown so we can get the value once the user starts to drag
+  var pointerPosition = getPointFromEvent(event);
+  pointerOrigin.x = pointerPosition.x;
+  pointerOrigin.y = pointerPosition.y;
+}
+
+// We save the original values from the viewBox
+var viewBox = {
+  x: 80,
+  y: 60,
+  width: 1920,
+  height: 880,
+};
+
+// The distances calculated from the pointer will be stored here
+var newViewBox = {
+  x: 0,
+  y: 0,
+  width: 1920,
+  height: 880,
+};
+
+// Calculate the ratio based on the viewBox width and the SVG width
+var ratio = viewBox.width / svg.getBoundingClientRect().width;
+window.addEventListener("resize", function () {
+  ratio = viewBox.width / svg.getBoundingClientRect().width;
+});
+
+// Function called by the event listeners when user start moving/dragging
+function onPointerMove(e) {
+  // Only run this function if the pointer is down
+  if (!isPointerDown) {
+    return;
+  }
+  // This prevent user to do a selection on the page
+  e.preventDefault();
+
+  // Get the pointer position
+  var pointerPosition = getPointFromEvent(e);
+
+  // We calculate the distance between the pointer origin and the current position
+  // The viewBox x & y values must be calculated from the original values and the distances
+  newViewBox.x = viewBox.x - (pointerPosition.x - pointerOrigin.x) * ratio;
+  newViewBox.y = viewBox.y - (pointerPosition.y - pointerOrigin.y) * ratio;
+
+  // We create a string with the new viewBox values
+  // The X & Y values are equal to the current viewBox minus the calculated distances
+  var viewBoxString = `${newViewBox.x} ${newViewBox.y} ${newViewBox.width} ${newViewBox.height}`;
+  // We apply the new viewBox values onto the SVG
+  svg.setAttribute("viewBox", viewBoxString);
+}
+
+function onPointerUp() {
+  // The pointer is no longer considered as down
+  isPointerDown = false;
+
+  // We save the viewBox coordinates based on the last pointer offsets
+  viewBox.x = newViewBox.x;
+  viewBox.y = newViewBox.y;
+}
+
+$(".map-container").on("wheel", (e) => {
+  e.preventDefault();
+
+  var dir = e.originalEvent.deltaY < 0 ? 0.9 : 1.1;
+
+  newViewBox.x += dir * newViewBox.width - viewBox.width;
+  newViewBox.y += dir * newViewBox.height - viewBox.height;
+
+  newViewBox.width *= dir;
+  newViewBox.height *= dir;
+
+  viewBox.x = newViewBox.x;
+  viewBox.y = newViewBox.y;
+
+  // We create a string with the new viewBox values
+  // The X & Y values are equal to the current viewBox minus the calculated distances
+  var viewBoxString = `${newViewBox.x} ${newViewBox.y} ${newViewBox.width} ${newViewBox.height}`;
+  // We apply the new viewBox values onto the SVG
+  svg.setAttribute("viewBox", viewBoxString);
 });

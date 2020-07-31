@@ -54,18 +54,6 @@
       </ul>
     </div>
 
-    <div class="buttons">
-      <label for="zoom" class="zoom" id="zoom-label">Zoom</label> <br />
-      <button class="zoom" id="0">&plus;</button> <br />
-      <button class="zoom" id="1">&minus;</button> <br />
-      <br />
-      <label for="move" class="move">Move</label> <br />
-      <button class="move" id="2">&uarr;</button> <br />
-      <button class="move" id="3">&larr;</button>
-      <button class="move" id="4">&darr;</button>
-      <button class="move" id="5">&rarr;</button>
-    </div>
-
     <div class="options">
       <input type="radio" id="cases" name="stat_type" checked />
       <label for="cases">New Cases</label><br />
@@ -75,10 +63,9 @@
       <label for="recovered">New Recovered</label><br />
     </div>
 
-    <!-- TODO: add functionality here -->
-    <div class="user-control">
+    <div class="switch-container">
       <label class="switch">
-        <input type="checkbox" checked />
+        <input type="checkbox" id="country-switch" checked />
         <span class="slider round"></span>
         <p>Country Name</p>
       </label>
@@ -1697,6 +1684,7 @@
     <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/responsive/2.2.5/js/dataTables.responsive.min.js"></script>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
     <script src="./main.js"></script>
   </body>
 </html>
