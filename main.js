@@ -354,8 +354,8 @@ function displayStatsPerCountry(summary) {
         });
       } else if (e.type == "mousemove") {
         $info_box.parents("div").css({
-          left: e.pageX - $info_box.outerWidth() / 2 - 6,
-          top: e.pageY - 186,
+          left: e.pageX - 305,
+          top: e.pageY - 360,
         });
         $info_box.parents("div").show();
       } else {
@@ -532,12 +532,18 @@ function plotData(summary, local, index) {
         },
       },
     },
+    legend: {
+      x: window.innerWidth > 600 ? 0.25 : -0.2,
+      y: 1.1,
+      orientation: "h",
+    },
   };
 
+  var config = { responsive: true };
   var data = [trace1, trace2, trace3];
 
   let plot_id = local ? "local_graph" : "global_graph";
-  Plotly.newPlot(plot_id, data, layout);
+  Plotly.newPlot(plot_id, data, layout, config);
 }
 
 var text = [
@@ -685,18 +691,38 @@ $(".map-container").on("wheel", (e) => {
 
   var dir = e.originalEvent.deltaY < 0 ? 0.9 : 1.1;
 
-  newViewBox.x += dir * newViewBox.width - viewBox.width;
-  newViewBox.y += dir * newViewBox.height - viewBox.height;
+  newViewBox.x -= dir * newViewBox.width - viewBox.width;
+  newViewBox.y -= dir * newViewBox.height - viewBox.height;
 
   newViewBox.width *= dir;
   newViewBox.height *= dir;
 
   viewBox.x = newViewBox.x;
   viewBox.y = newViewBox.y;
+  viewBox.width = newViewBox.width;
+  viewBox.height = newViewBox.height;
 
   // We create a string with the new viewBox values
   // The X & Y values are equal to the current viewBox minus the calculated distances
   var viewBoxString = `${newViewBox.x} ${newViewBox.y} ${newViewBox.width} ${newViewBox.height}`;
+  // We apply the new viewBox values onto the SVG
+  svg.setAttribute("viewBox", viewBoxString);
+});
+
+$("#fit-screen").on("click", (e) => {
+  viewBox.x = 80;
+  viewBox.y = 60;
+  viewBox.width = 1920;
+  viewBox.height = 880;
+
+  newViewBox.x = 80;
+  newViewBox.y = 60;
+  newViewBox.width = 1920;
+  newViewBox.height = 880;
+
+  // We create a string with the new viewBox values
+  // The X & Y values are equal to the current viewBox minus the calculated distances
+  var viewBoxString = `${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`;
   // We apply the new viewBox values onto the SVG
   svg.setAttribute("viewBox", viewBoxString);
 });
