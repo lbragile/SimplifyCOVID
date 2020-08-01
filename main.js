@@ -671,12 +671,12 @@ function onPointerUp() {
   viewBox.y = newViewBox.y;
 }
 
-$(".map-container").on("wheel gesturechange", (e) => {
+$(".map-container").on("wheel gestureend", (e) => {
   e.preventDefault();
 
   var dir =
     (e.type == "wheel" && e.originalEvent.deltaY < 0) ||
-    (e.type == "gesturechange" && e.scale > 1.0)
+    (e.type == "gestureend" && e.scale > 1.0)
       ? 0.9
       : 1.1;
 

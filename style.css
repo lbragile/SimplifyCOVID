@@ -443,7 +443,9 @@ svg a text {
 
   /* MAP */
   .map-container {
-    transform: scale(4);
+    transform: scale(3);
+    transform-origin: 175px 50px;
+    height: 325px;
   }
 
   .map-container path {
