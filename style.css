@@ -203,17 +203,29 @@ input:checked + .slider:before {
   stroke-opacity: 0.2;
 }
 
-#fit-screen {
+#fit-screen,
+#zoom-in,
+#zoom-out {
   padding: 5px;
   font-size: 1rem;
   font-weight: bold;
   background: rgba(0, 0, 0, 0.4);
   color: white;
+  z-index: 3;
+  border-radius: 10%;
+}
+
+#zoom-in,
+#zoom-out {
+  visibility: hidden;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: column;
   position: absolute;
   top: 5px;
   right: 5px;
-  z-index: 3;
-  border-radius: 10%;
 }
 
 .info-box {
@@ -449,17 +461,22 @@ svg a text {
   /* MAP */
   .map-container {
     transform: scale(3);
-    height: 325px;
+    height: 300px;
   }
 
-  .map-container path {
-    stroke-width: 2px;
-    stroke-opacity: 0.4;
-  }
-
-  #fit-screen {
+  #fit-screen,
+  #zoom-in,
+  #zoom-out {
     padding: 6px;
     font-size: 0.85rem;
+    visibility: visible;
+    margin: 2px 0;
+  }
+
+  .buttons {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     top: 4px;
     right: 4px;
   }

@@ -365,8 +365,8 @@ function displayStatsPerCountry(summary) {
             left_pos = e.pageX - elem_width / 2;
             top_pos = e.pageY - elem_height - 10;
           } else {
-            left_pos = e.touches[0].clientX - elem_width / 2;
-            top_pos = e.touches[0].clientY - elem_height - 10;
+            left_pos = e.touches[0].pageX - elem_width / 2;
+            top_pos = e.touches[0].pageY - elem_height - 20;
           }
           $info_box.parents("div").css({
             left: left_pos,
@@ -571,7 +571,7 @@ for (var i = 0; i <= colors.length; i++) {
   rect_colors.eq(i).html("<p>" + text[i] + "</p>");
 }
 
-var panZoomTiger = svgPanZoom("#svg-map", {
+var panZoom = svgPanZoom("#svg-map", {
   panEnabled: true,
   controlIconsEnabled: false,
   zoomEnabled: true,
@@ -588,5 +588,15 @@ var panZoomTiger = svgPanZoom("#svg-map", {
 });
 
 $("#fit-screen").on("click", (e) => {
-  panZoomTiger.reset();
+  panZoom.reset();
+});
+
+$("#zoom-in").on("click", (e) => {
+  let current_zoom = panZoom.getZoom();
+  panZoom.zoom(current_zoom * 1.2);
+});
+
+$("#zoom-out").on("click", (e) => {
+  let current_zoom = panZoom.getZoom();
+  panZoom.zoom(current_zoom * 0.8);
 });

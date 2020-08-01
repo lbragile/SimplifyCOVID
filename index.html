@@ -13,6 +13,8 @@
       rel="stylesheet"
       href="https://cdn.datatables.net/responsive/2.2.5/css/responsive.dataTables.min.css"
     />
+    <link rel="shortcut icon" type="image/png"
+    href="https://img.icons8.com/dusk/64/000000/coronavirus.png"/>
   </head>
   <body>
     <section>
@@ -111,7 +113,11 @@
     </div>
 
     <section>
-      <button type="button" id="fit-screen">fit</button>
+      <div class="buttons">
+        <button type="button" id="fit-screen">fit</button>
+        <button type="button" id="zoom-in">&plus;</button>
+        <button type="button" id="zoom-out">&minus;</button>
+      </div>
 
       <!-- color bar for map coloring -->
       <div id="colorbar">
