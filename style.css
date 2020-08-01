@@ -190,7 +190,7 @@ input:checked + .slider:before {
   background: rgba(0, 0, 0, 0.2);
   padding: 0;
   cursor: move;
-  touch-action: "pinch-zoom";
+  touch-action: "pan-left pan-right pan-up pan-down pinch-zoom";
 }
 
 .map-container path {
