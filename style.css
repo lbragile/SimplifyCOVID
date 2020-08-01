@@ -147,7 +147,7 @@ input:focus + .slider {
 }
 
 input:checked + .slider:before {
-  transform: translateX(26px);
+  transform: translateX(24px);
 }
 
 .slider.round {
@@ -309,6 +309,7 @@ svg a text {
   section {
     width: 100%;
     left: 0;
+    overflow: hidden;
   }
 
   /* GLOBAL */
@@ -404,7 +405,7 @@ svg a text {
   }
 
   input:checked + .slider:before {
-    transform: translateX(18px);
+    transform: translateX(16px);
   }
 
   .slider.round {
@@ -441,6 +442,10 @@ svg a text {
   }
 
   /* MAP */
+  .map-container {
+    transform: scale(4);
+  }
+
   .map-container path {
     stroke-width: 2px;
     stroke-opacity: 0.4;
@@ -456,9 +461,10 @@ svg a text {
   .info-box ul {
     font-size: 0.7rem;
   }
-  svg a text {
+
+  /* svg a text {
     font-size: 1.2rem;
-  }
+  } */
 
   #colorbar {
     display: none;
@@ -466,7 +472,7 @@ svg a text {
 
   /* GRAPHS */
   .graphs {
-    padding: 5px 0;
+    padding: 0;
     flex-direction: column;
   }
 
@@ -484,5 +490,9 @@ svg a text {
     text-align: center;
     font-size: 0.8rem;
     margin: 0 5%;
+  }
+
+  .table-position input {
+    margin: 2px 0;
   }
 }
