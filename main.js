@@ -324,53 +324,64 @@ function displayStatsPerCountry(summary) {
   });
 
   // map functionality
-  $link.on("mouseenter mousemove mouseleave", function (e) {
-    let path = $(this).children().first("path");
-    let index = getIndex(summary, path.attr("id"));
+  $link.on(
+    "mouseenter touchstart mousemove touchmove mouseleave touchend",
+    function (e) {
+      let path = $(this).children().first("path");
+      let index = getIndex(summary, path.attr("id"));
 
-    if (index != -1) {
-      if (e.type == "mouseenter") {
-        path.css("fill", "cyan");
+      if (index != -1) {
+        if (e.type == "mouseenter" || e.type == "touchstart") {
+          path.css("fill", "cyan");
 
-        let country = summary[index];
-        let stats = [
-          { Country: [country.country, country.countryInfo.iso2] },
-          { "New Confirmed": country.todayCases },
-          { "Total Confirmed": country.cases },
-          { "New Deaths": country.todayDeaths },
-          { "Total Deaths": country.deaths },
-          { "New Recovered": country.todayRecovered },
-          { "Total Recovered": country.recovered },
-          { Population: country.population },
-        ];
+          let country = summary[index];
+          let stats = [
+            { Country: [country.country, country.countryInfo.iso2] },
+            { "New Confirmed": country.todayCases },
+            { "Total Confirmed": country.cases },
+            { "New Deaths": country.todayDeaths },
+            { "Total Deaths": country.deaths },
+            { "New Recovered": country.todayRecovered },
+            { "Total Recovered": country.recovered },
+            { Population: country.population },
+          ];
 
-        $.each($info_box, (index) => {
-          let key = Object.keys(stats[index])[0],
-            value = Object.values(stats[index])[0];
+          $.each($info_box, (index) => {
+            let key = Object.keys(stats[index])[0],
+              value = Object.values(stats[index])[0];
 
-          if (index == 0) {
-            $info_box.eq(index).html(`${value[0]} (${value[1]})`);
+            if (index == 0) {
+              $info_box.eq(index).html(`${value[0]} (${value[1]})`);
+            } else {
+              $info_box.eq(index).html(`${key}: ${numberWithCommas(value)}`);
+            }
+          });
+        } else if (e.type == "mousemove" || e.type == "touchmove") {
+          let elem_width = parseInt($info_box.parents("div").css("width"));
+          let elem_height = parseInt($info_box.parents("div").css("height"));
+
+          var left_pos, top_pos;
+          if (e.type == "mousemove") {
+            left_pos = e.pageX - elem_width / 2;
+            top_pos = e.pageY - elem_height - 10;
           } else {
-            $info_box.eq(index).html(`${key}: ${numberWithCommas(value)}`);
+            left_pos = e.touches[0].clientX - elem_width / 2;
+            top_pos = e.touches[0].clientY - elem_height - 10;
           }
-        });
-      } else if (e.type == "mousemove") {
-        let elem_width = parseInt($info_box.parents("div").css("width"));
-        let elem_height = parseInt($info_box.parents("div").css("height"));
-
-        $info_box.parents("div").css({
-          left: e.pageX - elem_width / 2,
-          top: e.pageY - elem_height - 10,
-        });
-        $info_box.parents("div").show();
+          $info_box.parents("div").css({
+            left: left_pos,
+            top: top_pos,
+          });
+          $info_box.parents("div").show();
+        } else {
+          $info_box.parents("div").hide();
+          statisticHeatMap(summary);
+        }
       } else {
-        $info_box.parents("div").hide();
-        statisticHeatMap(summary);
+        $(this).hide();
       }
-    } else {
-      $(this).hide();
     }
-  });
+  );
 
   $(".options")
     .children("input")
@@ -430,7 +441,7 @@ function plotHistory(summary, countries, local) {
   plotData(summary, local, 0); // default plot
 
   if (local) {
-    $(document).on("click", "path", function () {
+    $(document).on("click touchstart", "path", function () {
       $(this).animate(
         {
           opacity: 0.25,
@@ -560,135 +571,22 @@ for (var i = 0; i <= colors.length; i++) {
   rect_colors.eq(i).html("<p>" + text[i] + "</p>");
 }
 
-// We select the SVG into the page
-var svg = document.getElementById("svg-map");
-
-// If browser supports pointer events
-if (window.PointerEvent) {
-  svg.addEventListener("pointerdown", onPointerDown); // Pointer is pressed
-  svg.addEventListener("pointerup", onPointerUp); // Releasing the pointer
-  svg.addEventListener("pointerleave", onPointerUp); // Pointer gets out of the SVG area
-  svg.addEventListener("pointermove", onPointerMove); // Pointer is moving
-} else {
-  // Add all mouse events listeners fallback
-  svg.addEventListener("mousedown", onPointerDown); // Pressing the mouse
-  svg.addEventListener("mouseup", onPointerUp); // Releasing the mouse
-  svg.addEventListener("mouseleave", onPointerUp); // Mouse gets out of the SVG area
-  svg.addEventListener("mousemove", onPointerMove); // Mouse is moving
-}
-
-// This function returns an object with X & Y values from the pointer event
-function getPointFromEvent(e) {
-  var point = { x: 0, y: 0 };
-
-  point.x = e.clientX;
-  point.y = e.clientY;
-
-  return point;
-}
-
-// This variable will be used later for move events to check if pointer is down or not
-var isPointerDown = false;
-
-// This variable will contain the original coordinates when the user start pressing the mouse or touching the screen
-var pointerOrigin = {
-  x: 0,
-  y: 0,
-};
-
-// Function called by the event listeners when user start pressing/touching
-function onPointerDown(event) {
-  isPointerDown = true; // We set the pointer as down
-
-  // We get the pointer position on click/touchdown so we can get the value once the user starts to drag
-  var pointerPosition = getPointFromEvent(event);
-  pointerOrigin.x = pointerPosition.x;
-  pointerOrigin.y = pointerPosition.y;
-}
-
-// We save the original values from the viewBox
-var viewBox = {
-  x: 80,
-  y: 60,
-  width: 1920,
-  height: 880,
-};
-
-// The distances calculated from the pointer will be stored here
-var newViewBox = {
-  x: 0,
-  y: 0,
-  width: 1920,
-  height: 880,
-};
-
-// Calculate the ratio based on the viewBox width and the SVG width
-var ratio = viewBox.width / svg.getBoundingClientRect().width;
-window.addEventListener("resize", function () {
-  ratio = viewBox.width / svg.getBoundingClientRect().width;
-});
-
-// Function called by the event listeners when user start moving/dragging
-function onPointerMove(e) {
-  // Only run this function if the pointer is down
-  if (!isPointerDown) {
-    return;
-  }
-  // This prevent user to do a selection on the page
-  e.preventDefault();
-
-  // Get the pointer position
-  var pointerPosition = getPointFromEvent(e);
-
-  // We calculate the distance between the pointer origin and the current position
-  // The viewBox x & y values must be calculated from the original values and the distances
-  newViewBox.x = viewBox.x - (pointerPosition.x - pointerOrigin.x) * ratio;
-  newViewBox.y = viewBox.y - (pointerPosition.y - pointerOrigin.y) * ratio;
-
-  var viewBoxString = `${newViewBox.x} ${newViewBox.y} ${newViewBox.width} ${newViewBox.height}`;
-  svg.setAttribute("viewBox", viewBoxString);
-}
-
-function onPointerUp() {
-  // The pointer is no longer considered as down
-  isPointerDown = false;
-
-  // We save the viewBox coordinates based on the last pointer offsets
-  viewBox.x = newViewBox.x;
-  viewBox.y = newViewBox.y;
-}
-
-$(".map-container").on("wheel", (e) => {
-  e.preventDefault();
-
-  var dir = e.type == "wheel" && e.originalEvent.deltaY < 0 ? 0.9 : 1.1;
-
-  newViewBox.x -= dir * newViewBox.width - viewBox.width;
-  newViewBox.y -= dir * newViewBox.height - viewBox.height;
-
-  newViewBox.width *= dir;
-  newViewBox.height *= dir;
-
-  viewBox.x = newViewBox.x;
-  viewBox.y = newViewBox.y;
-  viewBox.width = newViewBox.width;
-  viewBox.height = newViewBox.height;
-
-  var viewBoxString = `${newViewBox.x} ${newViewBox.y} ${newViewBox.width} ${newViewBox.height}`;
-  svg.setAttribute("viewBox", viewBoxString);
+var panZoomTiger = svgPanZoom("#svg-map", {
+  panEnabled: true,
+  controlIconsEnabled: false,
+  zoomEnabled: true,
+  dblClickZoomEnabled: true,
+  mouseWheelZoomEnabled: true,
+  preventMouseEventsDefault: true,
+  zoomScaleSensitivity: 0.2,
+  minZoom: 1,
+  maxZoom: 5,
+  fit: true,
+  contain: false,
+  center: true,
+  refreshRate: "auto",
 });
 
 $("#fit-screen").on("click", (e) => {
-  viewBox.x = 80;
-  viewBox.y = 60;
-  viewBox.width = 1920;
-  viewBox.height = 880;
-
-  newViewBox.x = 80;
-  newViewBox.y = 60;
-  newViewBox.width = 1920;
-  newViewBox.height = 880;
-
-  var viewBoxString = `${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`;
-  svg.setAttribute("viewBox", viewBoxString);
+  panZoomTiger.reset();
 });
