@@ -580,14 +580,9 @@ if (window.PointerEvent) {
 // This function returns an object with X & Y values from the pointer event
 function getPointFromEvent(e) {
   var point = { x: 0, y: 0 };
-  // If event is triggered by a touch event, we get the position of the first finger
-  if (e.targetTouches) {
-    point.x = e.targetTouches[0].clientX;
-    point.y = e.targetTouches[0].clientY;
-  } else {
-    point.x = e.clientX;
-    point.y = e.clientY;
-  }
+
+  point.x = e.clientX;
+  point.y = e.clientY;
 
   return point;
 }
@@ -650,10 +645,7 @@ function onPointerMove(e) {
   newViewBox.x = viewBox.x - (pointerPosition.x - pointerOrigin.x) * ratio;
   newViewBox.y = viewBox.y - (pointerPosition.y - pointerOrigin.y) * ratio;
 
-  // We create a string with the new viewBox values
-  // The X & Y values are equal to the current viewBox minus the calculated distances
   var viewBoxString = `${newViewBox.x} ${newViewBox.y} ${newViewBox.width} ${newViewBox.height}`;
-  // We apply the new viewBox values onto the SVG
   svg.setAttribute("viewBox", viewBoxString);
 }
 
@@ -682,10 +674,7 @@ $(".map-container").on("wheel", (e) => {
   viewBox.width = newViewBox.width;
   viewBox.height = newViewBox.height;
 
-  // We create a string with the new viewBox values
-  // The X & Y values are equal to the current viewBox minus the calculated distances
   var viewBoxString = `${newViewBox.x} ${newViewBox.y} ${newViewBox.width} ${newViewBox.height}`;
-  // We apply the new viewBox values onto the SVG
   svg.setAttribute("viewBox", viewBoxString);
 });
 
@@ -700,9 +689,6 @@ $("#fit-screen").on("click", (e) => {
   newViewBox.width = 1920;
   newViewBox.height = 880;
 
-  // We create a string with the new viewBox values
-  // The X & Y values are equal to the current viewBox minus the calculated distances
   var viewBoxString = `${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`;
-  // We apply the new viewBox values onto the SVG
   svg.setAttribute("viewBox", viewBoxString);
 });
