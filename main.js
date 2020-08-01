@@ -92,6 +92,7 @@ function addText(summary) {
       "Germany",
       "Greece",
       "Libyan Arab Jamahiriya",
+      "Vanuatu",
     ];
     var include_countries = [
       "Greenland",
@@ -174,10 +175,11 @@ function displayGlobalStatistics(summary) {
   for (let index in allowed_values) {
     if (index < allowed_values.length - 1) {
       html_val = numberWithCommas(summary[allowed_values[index]]);
+      $(".global-info").find("span").eq(index).html(html_val);
     } else {
       html_val = convertStringToDateTime(summary[allowed_values[index]]);
+      $("#update-time span").html(html_val);
     }
-    $(".global-info").find("span").eq(index).html(html_val);
   }
 
   addTableRow(summary);
@@ -353,9 +355,12 @@ function displayStatsPerCountry(summary) {
           }
         });
       } else if (e.type == "mousemove") {
+        let elem_width = parseInt($info_box.parents("div").css("width"));
+        let elem_height = parseInt($info_box.parents("div").css("height"));
+
         $info_box.parents("div").css({
-          left: e.pageX - 305,
-          top: e.pageY - 360,
+          left: e.pageX - elem_width / 2,
+          top: e.pageY - elem_height - 10,
         });
         $info_box.parents("div").show();
       } else {
@@ -422,22 +427,7 @@ function plotHistory(summary, countries, local) {
     "New Caledonia",
   ];
 
-  // // clear the list
-  // $(".countrydata").html("");
-  // countries.forEach((element, index) => {
-  //   if (!not_available_countries.includes(element)) {
-  //     let option = new Option(element, index);
-  //     $(option).html(element);
-  //     $(".countrydata").append(option);
-  //   }
-  // });
-
   plotData(summary, local, 0); // default plot
-
-  // $(".countrydata").on("change", () => {
-  //   let option_index = $(".countrydata option:selected").index();
-  //   plotData(summary, local, option_index);
-  // });
 
   if (local) {
     $(document).on("click", "path", function () {
@@ -466,6 +456,10 @@ function plotHistory(summary, countries, local) {
         let option_index = countries.indexOf($(this).attr("data-name"));
         plotData(summary, local, option_index);
       }
+
+      $(".table-position input")
+        .val($(this).attr("data-name"))
+        .trigger("keyup.DT");
     });
   }
 }
@@ -565,15 +559,6 @@ for (var i = 0; i <= colors.length; i++) {
 
   rect_colors.eq(i).html("<p>" + text[i] + "</p>");
 }
-
-// // to get the colors
-// rect_colors.on("click", function (e) {
-//   alert(
-//     "This color is: " +
-//       $(this).css("background-color") +
-//       "\nNote that 100% corresponds to the maximum number reported by a given country and likewise 0% refers to the minimum."
-//   );
-// });
 
 // We select the SVG into the page
 var svg = document.getElementById("svg-map");

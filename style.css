@@ -21,10 +21,16 @@ section {
 .global-info {
   background: rgba(0, 0, 0, 0.6);
   color: white;
+  font-weight: bold;
   top: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
 }
 
-.global-info .row1-global {
+.row1-global,
+.row2-global {
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -33,9 +39,7 @@ section {
 
 .global-info p {
   padding: 4px 3px;
-  background: white;
   color: black;
-  font-weight: bold;
   border: 1px solid black;
   margin: 3px 40px;
   border-radius: 15px 0 15px 0;
@@ -43,12 +47,18 @@ section {
   min-width: 150px;
 }
 
-.global-info #update-time {
+#update-time {
   padding: 3px 0;
   text-align: center;
+  position: absolute;
+  right: 5px;
+  bottom: 0px;
+  color: white;
+  font-weight: bold;
 }
 
-.global-info span {
+.global-info span,
+#update-time span {
   font-weight: normal;
 }
 
@@ -90,7 +100,7 @@ section {
   display: flex;
   flex-direction: column;
   position: absolute;
-  bottom: 5px;
+  bottom: 25%;
   right: 128px;
 }
 
@@ -221,7 +231,6 @@ input:checked + .slider:before {
   margin: 0 auto;
   padding: 5px;
   z-index: 3;
-  width: 225px;
 }
 
 .info-box ul::after {
@@ -229,13 +238,11 @@ input:checked + .slider:before {
   background: transparent;
   position: absolute;
   margin-left: -5px;
-
   width: 0;
   height: 0;
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
   border-top: 10px solid rgba(0, 0, 0, 0.9);
-
   top: 100%;
   left: 50%;
 }
@@ -305,74 +312,60 @@ svg a text {
   }
 
   /* GLOBAL */
-  .global-info .row1-global {
+  .global-info {
+    flex-direction: column;
+  }
+
+  .global-info .row1-global,
+  .row2-global {
     font-size: 0.75rem;
   }
 
   .global-info p {
     padding: 3px 2px;
     margin: 3px 2px;
-    min-width: 70px;
+    width: 150px;
   }
 
-  .global-info #update-time {
-    padding: 3px 0;
-    text-align: center;
-  }
-
-  .global-info span {
-    font-weight: normal;
-  }
-
-  #total p {
-    background: rgb(236, 112, 99);
-  }
-
-  #new p {
-    background: rgb(88, 214, 141);
-  }
-
-  #active-critical p {
-    background: rgb(93, 173, 226);
-  }
-
-  #population p {
-    background: rgb(235, 152, 78);
+  #update-time {
+    padding: 1px 0;
+    position: absolute;
+    color: white;
+    text-align: right;
+    font-size: 0.75rem;
+    z-index: 3;
   }
 
   .options {
     position: absolute;
-    top: 5px;
-    right: 10px;
-    z-index: 2;
-    display: none;
+    top: calc(65%);
   }
 
   .options label {
     color: white;
-    font-size: 1rem;
+    font-size: 0.75rem;
     font-weight: bold;
   }
 
   .options input {
     cursor: pointer;
-    margin: 5px 0;
+    margin: 0;
   }
 
   .switch-container {
     display: flex;
     flex-direction: column;
     position: absolute;
-    bottom: 5px;
-    right: 128px;
-    display: none;
+    bottom: 23px;
+    right: 100px;
+    z-index: 2;
   }
 
   .switch {
     position: relative;
     display: inline-block;
-    width: 40px;
-    height: 16px;
+    width: 30px;
+    height: 14px;
     margin: 3px 0;
   }
 
@@ -394,8 +387,8 @@ svg a text {
   .slider:before {
     position: absolute;
     content: "";
-    height: 14px;
-    width: 14px;
+    height: 12px;
+    width: 12px;
     left: 1px;
     bottom: 1px;
     background-color: white;
@@ -411,7 +404,7 @@ svg a text {
   }
 
   input:checked + .slider:before {
-    transform: translateX(26px);
+    transform: translateX(18px);
   }
 
   .slider.round {
@@ -427,26 +420,24 @@ svg a text {
     position: absolute;
     top: 0;
     left: 120%;
-    font-size: 1rem;
-    padding: 0;
-    width: 150px;
-    font-weight: bold;
+    font-size: 0.8rem;
   }
 
   .continents {
-    position: absolute;
-    top: 7.5%;
-    left: 10px;
-    display: none;
+    position: relative;
+    background: rgba(0, 0, 0, 0.6);
+    left: 0;
   }
 
   .continents label {
-    margin: 0;
-    padding: 5px;
-    letter-spacing: 1px;
-    color: white;
-    font-weight: bold;
-    font-size: 1.1rem;
+    position: relative;
+    font-size: 0.75rem;
+    left: 7px;
+  }
+
+  .continents input {
+    position: relative;
+    left: 10px;
   }
 
   /* MAP */
@@ -462,6 +453,9 @@ svg a text {
     right: 2px;
   }
 
+  .info-box ul {
+    font-size: 0.7rem;
+  }
   svg a text {
     font-size: 1.2rem;
   }
@@ -488,7 +482,7 @@ svg a text {
   .table-position {
     padding: 5px;
     text-align: center;
-    font-size: 1rem;
+    font-size: 0.8rem;
     margin: 0 5%;
   }
 }
