@@ -190,6 +190,7 @@ input:checked + .slider:before {
   background: rgba(0, 0, 0, 0.2);
   padding: 0;
   cursor: move;
+  touch-action: "pinch-zoom";
 }
 
 .map-container path {
@@ -446,7 +447,6 @@ svg a text {
     transform: scale(3);
     transform-origin: 175px 50px;
     height: 325px;
-    touch-action: auto;
   }
 
   .map-container path {
