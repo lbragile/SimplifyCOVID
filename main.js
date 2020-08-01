@@ -575,11 +575,6 @@ if (window.PointerEvent) {
   svg.addEventListener("mouseup", onPointerUp); // Releasing the mouse
   svg.addEventListener("mouseleave", onPointerUp); // Mouse gets out of the SVG area
   svg.addEventListener("mousemove", onPointerMove); // Mouse is moving
-
-  // Add all touch events listeners fallback
-  svg.addEventListener("touchstart", onPointerDown); // Finger is touching the screen
-  svg.addEventListener("touchend", onPointerUp); // Finger is no longer touching the screen
-  svg.addEventListener("touchmove", onPointerMove); // Finger is moving
 }
 
 // This function returns an object with X & Y values from the pointer event
@@ -671,14 +666,10 @@ function onPointerUp() {
   viewBox.y = newViewBox.y;
 }
 
-$(".map-container").on("wheel gestureend", (e) => {
+$(".map-container").on("wheel", (e) => {
   e.preventDefault();
 
-  var dir =
-    (e.type == "wheel" && e.originalEvent.deltaY < 0) ||
-    (e.type == "gestureend" && e.scale > 1.0)
-      ? 0.9
-      : 1.1;
+  var dir = e.type == "wheel" && e.originalEvent.deltaY < 0 ? 0.9 : 1.1;
 
   newViewBox.x -= dir * newViewBox.width - viewBox.width;
   newViewBox.y -= dir * newViewBox.height - viewBox.height;

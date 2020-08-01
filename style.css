@@ -446,6 +446,7 @@ svg a text {
     transform: scale(3);
     transform-origin: 175px 50px;
     height: 325px;
+    touch-action: auto;
   }
 
   .map-container path {
