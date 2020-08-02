@@ -15,6 +15,7 @@ section {
   left: 10%;
   margin: 0;
   padding: 0;
+  overflow: hidden;
 }
 
 /* GLOBAL */
@@ -51,7 +52,7 @@ section {
   padding: 3px 0;
   text-align: center;
   position: absolute;
-  right: 5px;
+  right: 10px;
   bottom: 0px;
   color: white;
   font-weight: bold;
@@ -85,6 +86,8 @@ section {
   top: 5px;
   right: 10px;
   z-index: 2;
+  display: flex;
+  flex-direction: column;
 }
 
 .options label {
@@ -197,6 +200,7 @@ input:checked + .slider:before {
 #svg-map {
   width: 100%;
   height: 100%;
+  transform: scale(1.5);
 }
 
 .map-container path {
@@ -303,7 +307,7 @@ svg a text {
 
 /* GRAPHS */
 .graphs {
-  padding: 25px 0;
+  padding: 10px 0;
   border: none;
   background: rgba(0, 0, 0, 0.6);
   display: flex;
@@ -313,7 +317,7 @@ svg a text {
 }
 
 .graphs #global_graph {
-  margin-left: 50px;
+  margin-left: 10px;
 }
 
 /* TABLE */
@@ -480,6 +484,10 @@ svg a text {
   .map-container {
     transform: scale(3);
     height: 300px;
+  }
+
+  #svg-map {
+    transform: translate(-60px, 25px);
   }
 
   #fit-screen,
