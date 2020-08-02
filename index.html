@@ -13,8 +13,11 @@
       rel="stylesheet"
       href="https://cdn.datatables.net/responsive/2.2.5/css/responsive.dataTables.min.css"
     />
-    <link rel="shortcut icon" type="image/png"
-    href="https://img.icons8.com/dusk/64/000000/coronavirus.png"/>
+    <link
+      rel="shortcut icon"
+      type="image/png"
+      href="https://img.icons8.com/dusk/64/000000/coronavirus.png"
+    />
   </head>
   <body>
     <section>
@@ -43,25 +46,6 @@
             <p>Population: <br /><span></span></p>
           </div>
         </div>
-      </div>
-
-      <div id="update-time">Last Updated: <span></span></div>
-
-      <div class="options">
-        <input type="radio" id="cases" name="stat_type" checked />
-        <label for="cases">New Cases</label><br />
-        <input type="radio" id="deaths" name="stat_type" />
-        <label for="deaths">New Deaths</label><br />
-        <input type="radio" id="recovered" name="stat_type" />
-        <label for="recovered">New Recovered</label><br />
-      </div>
-
-      <div class="switch-container">
-        <label class="switch">
-          <input type="checkbox" id="country-switch" checked />
-          <span class="slider round"></span>
-          <p>Country Name</p>
-        </label>
       </div>
 
       <div class="continents">
@@ -96,6 +80,35 @@
           />
           <label for="Australia/Oceania"> Australia/Oceania</label><br />
         </div>
+      </div>
+
+      <div id="update-time">
+        <p>Last Updated: &nbsp;</p>
+        <span></span>
+      </div>
+
+      <div class="options">
+        <label for="cases"
+          ><input type="radio" id="cases" name="stat_type" checked /> New
+          Cases</label
+        >
+
+        <label for="deaths"
+          ><input type="radio" id="deaths" name="stat_type" /> New Deaths
+        </label>
+
+        <label for="recovered">
+          <input type="radio" id="recovered" name="stat_type" /> New
+          Recovered</label
+        >
+      </div>
+
+      <div class="switch-container">
+        <label class="switch">
+          <input type="checkbox" id="country-switch" checked />
+          <span class="slider round"></span>
+          <p>Country Name</p>
+        </label>
       </div>
     </section>
 

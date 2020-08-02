@@ -140,7 +140,7 @@ function getIndex(summary, id) {
 }
 
 function statisticHeatMap(summary) {
-  $.each($(".options").children("input"), (index, value) => {
+  $.each($(".options").find("input"), (index, value) => {
     if ($(value).is(":checked")) {
       caseHeatMap(summary, value.id);
     }
@@ -384,7 +384,7 @@ function displayStatsPerCountry(summary) {
   );
 
   $(".options")
-    .children("input")
+    .find("input")
     .on("click", () => statisticHeatMap(summary));
 
   $continents
@@ -542,6 +542,10 @@ function plotData(summary, local, index) {
       y: 1.1,
       orientation: "h",
     },
+    width:
+      window.innerWidth > 993
+        ? 0.4 * window.innerWidth - 10
+        : window.innerWidth - 10,
   };
 
   var config = { responsive: true };
@@ -579,7 +583,7 @@ var panZoom = svgPanZoom("#svg-map", {
   mouseWheelZoomEnabled: true,
   preventMouseEventsDefault: true,
   zoomScaleSensitivity: 0.2,
-  minZoom: 1,
+  minZoom: 0.2,
   maxZoom: 5,
   fit: true,
   contain: false,
