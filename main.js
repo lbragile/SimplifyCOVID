@@ -17,135 +17,82 @@ var colors = [
   "#FFF",
 ];
 
-function caseHeatMap(summary, type) {
-  var country_cases = [];
-  $.each(summary, function (index, item) {
-    if (type == "cases") {
-      country_cases.push(item.todayCases);
-    } else if (type == "deaths") {
-      country_cases.push(item.todayDeaths);
-    } else {
-      country_cases.push(item.todayRecovered);
-    }
-  });
+var text = [
+  "≤100% <br><br> >87.5%",
+  "≤87.5% <br><br> >75.0%",
+  "≤75.0% <br><br> >62.5%",
+  "≤62.5% <br><br> >50.0%",
+  "≤50.0% <br><br> >37.5%",
+  "≤37.5% <br><br> >25.0%",
+  "≤25.0% <br><br> >12.5%",
+  "≤12.5% <br><br> ≥0.00%",
+];
 
-  p50_cases =
-    country_cases.reduce(function (a, b) {
-      return a + b;
-    }, 0) / country_cases.length;
+// country list
+var exclude_countries = [
+  "Chile",
+  "Haiti",
+  "Mozambique",
+  "Cambodia",
+  "Malawi",
+  "Burundi",
+  "Uganda",
+  "Benin",
+  "Portugal",
+  "Côte d'Ivoire",
+  "Netherlands",
+  "Czechia",
+  "Belgium",
+  "Rwanda",
+  "Germany",
+  "Greece",
+  "Libyan Arab Jamahiriya",
+  "Vanuatu",
+];
 
-  p100_cases = Math.max(...country_cases);
-  p0_cases = Math.min(...country_cases);
+var include_countries = [
+  "Greenland",
+  "Mongolia",
+  "Fiji",
+  "New Zealand",
+  "Papua New Guinea",
+  "Uruguay",
+  "Paraguay",
+  "Namibia",
+  "Iceland",
+  "Norway",
+];
 
-  p75_cases = (p50_cases + p100_cases) / 2;
-  p875_cases = (p75_cases + p100_cases) / 2;
-  p625_cases = (p50_cases + p75_cases) / 2;
+// statistics
+var allowed_values = [
+  "cases",
+  "deaths",
+  "recovered",
+  "todayCases",
+  "todayDeaths",
+  "todayRecovered",
+  "active",
+  "critical",
+  "affectedCountries",
+  "population",
+  "updated",
+];
 
-  p25_cases = (p0_cases + p50_cases) / 2;
-  p375_cases = (p50_cases + p25_cases) / 2;
-  p125_cases = (p0_cases + p25_cases) / 2;
-
-  $.each($paths, function (_, path) {
-    let index = getIndex(summary, path.getAttribute("id"));
-    if (country_cases[index] > p875_cases) {
-      path.style.fill = colors[0];
-    } else if (country_cases[index] > p75_cases) {
-      path.style.fill = colors[1];
-    } else if (country_cases[index] > p625_cases) {
-      path.style.fill = colors[2];
-    } else if (country_cases[index] > p50_cases) {
-      path.style.fill = colors[3];
-    } else if (country_cases[index] > p375_cases) {
-      path.style.fill = colors[4];
-    } else if (country_cases[index] > p25_cases) {
-      path.style.fill = colors[5];
-    } else if (country_cases[index] > p125_cases) {
-      path.style.fill = colors[6];
-    } else {
-      path.style.fill = colors[7];
-    }
-  });
-}
-
-function addText(summary) {
-  $.each($paths, (pos, value) => {
-    let id = value.getAttribute("id");
-    if (id.length == 2) {
-      index = getIndex(summary, id);
-    }
-
-    var exclude_countries = [
-      "Chile",
-      "Haiti",
-      "Mozambique",
-      "Cambodia",
-      "Malawi",
-      "Burundi",
-      "Uganda",
-      "Benin",
-      "Portugal",
-      "Côte d'Ivoire",
-      "Netherlands",
-      "Czechia",
-      "Belgium",
-      "Rwanda",
-      "Germany",
-      "Greece",
-      "Libyan Arab Jamahiriya",
-      "Vanuatu",
-    ];
-    var include_countries = [
-      "Greenland",
-      "Mongolia",
-      "Fiji",
-      "New Zealand",
-      "Papua New Guinea",
-      "Uruguay",
-      "Paraguay",
-      // "Libyan Arab Jamahiriya",
-      "Namibia",
-      "Iceland",
-      "Norway",
-    ];
-
-    if (
-      (summary[index].population > 10000000 &&
-        !exclude_countries.includes(summary[index].country)) ||
-      include_countries.includes(summary[index].country)
-    ) {
-      writeText($paths[pos]);
-    }
-  });
-}
-
-function writeText(p) {
-  var t = document.createElementNS("http://www.w3.org/2000/svg", "text");
-  var b = p.getBBox();
-  t.setAttribute(
-    "transform",
-    "translate(" + (b.x + b.width / 2) + " " + (b.y + b.height / 2) + ")"
-  );
-  t.textContent = p.getAttribute("data-name");
-  t.setAttribute("id", "text-" + p.getAttribute("id"));
-
-  p.parentNode.insertBefore(t, p.nextSibling);
-}
-
-function getIndex(summary, id) {
-  var index = summary.findIndex(function (item) {
-    return item.countryInfo.iso2 == id;
-  });
-
-  return index;
-}
-
-function statisticHeatMap(summary) {
-  $.each($(".options").find("input"), (index, value) => {
-    if ($(value).is(":checked")) {
-      caseHeatMap(summary, value.id);
-    }
-  });
-}
+var pan_zoom_settings = {
+  panEnabled: true,
+  controlIconsEnabled: false,
+  zoomEnabled: true,
+  dblClickZoomEnabled: true,
+  mouseWheelZoomEnabled: true,
+  preventMouseEventsDefault: true,
+  zoomScaleSensitivity: 0.2,
+  minZoom: 0.2,
+  maxZoom: 5,
+  fit: true,
+  contain: false,
+  center: true,
+  refreshRate: "auto",
+};
 
 function numberWithCommas(x) {
   if (x != undefined) {
@@ -157,20 +104,102 @@ function convertStringToDateTime(x) {
   return new Date(x).toLocaleString("en-US", { timeZone: "America/Vancouver" });
 }
 
+function getIndex(summary, id) {
+  var index = summary.findIndex(function (item) {
+    return item.countryInfo.iso2 == id;
+  });
+
+  return index;
+}
+
+function addText(summary) {
+  $.each($paths, (pos, value) => {
+    let id = value.getAttribute("id");
+    if (id.length == 2) {
+      index = getIndex(summary, id);
+    }
+
+    if (
+      (summary[index].population > 10000000 &&
+        !exclude_countries.includes(summary[index].country)) ||
+      include_countries.includes(summary[index].country)
+    ) {
+      let p = $paths[pos];
+      let t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      let b = p.getBBox();
+
+      if (b.width > 0) {
+        t.setAttribute(
+          "transform",
+          "translate(" + (b.x + b.width / 2) + " " + (b.y + b.height / 2) + ")"
+        );
+        t.textContent = p.getAttribute("data-name");
+        t.setAttribute("id", "text-" + p.getAttribute("id"));
+
+        p.parentNode.insertBefore(t, p.nextSibling);
+      }
+    }
+  });
+}
+
+function statisticHeatMap(summary) {
+  $.each($(".options").find("input"), (index, value) => {
+    if ($(value).is(":checked")) {
+      var country_cases = [];
+      $.each(summary, function (index, item) {
+        if (value.id == "cases") {
+          country_cases.push(item.todayCases);
+        } else if (value.id == "deaths") {
+          country_cases.push(item.todayDeaths);
+        } else {
+          country_cases.push(item.todayRecovered);
+        }
+      });
+
+      var p50_cases =
+        country_cases.reduce(function (a, b) {
+          return a + b;
+        }, 0) / country_cases.length;
+
+      var p100_cases = Math.max(...country_cases);
+      var p0_cases = Math.min(...country_cases);
+
+      var p75_cases = (p50_cases + p100_cases) / 2;
+      var p875_cases = (p75_cases + p100_cases) / 2;
+      var p625_cases = (p50_cases + p75_cases) / 2;
+
+      var p25_cases = (p0_cases + p50_cases) / 2;
+      var p375_cases = (p50_cases + p25_cases) / 2;
+      var p125_cases = (p0_cases + p25_cases) / 2;
+
+      $.each($paths, function (_, path) {
+        let index = getIndex(summary, path.getAttribute("id"));
+        if (country_cases[index] > p875_cases) {
+          path.style.fill = colors[0];
+        } else if (country_cases[index] > p75_cases) {
+          path.style.fill = colors[1];
+        } else if (country_cases[index] > p625_cases) {
+          path.style.fill = colors[2];
+        } else if (country_cases[index] > p50_cases) {
+          path.style.fill = colors[3];
+        } else if (country_cases[index] > p375_cases) {
+          path.style.fill = colors[4];
+        } else if (country_cases[index] > p25_cases) {
+          path.style.fill = colors[5];
+        } else if (country_cases[index] > p125_cases) {
+          path.style.fill = colors[6];
+        } else {
+          path.style.fill = colors[7];
+        }
+      });
+    }
+  });
+}
+
 function displayGlobalStatistics(summary) {
-  var allowed_values = [
-    "cases",
-    "deaths",
-    "recovered",
-    "todayCases",
-    "todayDeaths",
-    "todayRecovered",
-    "active",
-    "critical",
-    "affectedCountries",
-    "population",
-    "updated",
-  ];
+  if (summary["affectedCountries"] == 215) {
+    summary["affectedCountries"] = 213; // 2 ships don't count as countries
+  }
 
   for (let index in allowed_values) {
     if (index < allowed_values.length - 1) {
@@ -241,6 +270,7 @@ function displayContinents(summary) {
     }
   });
 
+  // for continent updating
   var stats = {
     cases: 0,
     deaths: 0,
@@ -266,7 +296,137 @@ function displayContinents(summary) {
   stats["affectedCountries"] = country_names.length;
   stats["updated"] = $("#update-time span").html();
 
+  $("#svg-map text").hide();
+  if ($("#country-switch").is(":checked")) {
+    addText(summary);
+  }
   displayGlobalStatistics(stats);
+}
+
+function plotHistory(summary, countries, local) {
+  var not_available_countries = [
+    "Greenland",
+    "Faroe Islands",
+    "Falkland Islands (Malvinas)",
+    "Réunion",
+    "New Caledonia",
+  ];
+
+  plotData(summary, local, 0); // default plot
+
+  if (local) {
+    $(document).on("click touchstart", "path", function () {
+      $(this).animate(
+        {
+          opacity: 0.25,
+          "stroke-width": "10px",
+        },
+        2000,
+        "linear"
+      );
+
+      $(this).animate(
+        {
+          opacity: 1,
+          "stroke-width": "1px",
+        },
+        1000,
+        "linear"
+      );
+
+      if (not_available_countries.includes($(this).attr("data-name"))) {
+        alert(`${$(this).attr("data-name")} doesn't have any historical data`);
+        return;
+      } else {
+        let option_index = countries.indexOf($(this).attr("data-name"));
+        plotData(summary, local, option_index);
+      }
+
+      $(".table-position input")
+        .val($(this).attr("data-name"))
+        .trigger("keyup.DT");
+    });
+  }
+}
+
+function plotData(summary, local, index) {
+  let trace1 = {
+    x: local
+      ? Object.keys(summary[index].timeline.cases)
+      : Object.keys(summary.cases),
+    y: local
+      ? Object.values(summary[index].timeline.cases)
+      : Object.values(summary.cases),
+    type: "scatter",
+    name: "cases",
+  };
+
+  let trace2 = {
+    x: local
+      ? Object.keys(summary[index].timeline.deaths)
+      : Object.keys(summary.deaths),
+    y: local
+      ? Object.values(summary[index].timeline.deaths)
+      : Object.values(summary.deaths),
+    type: "scatter",
+    name: "deaths",
+  };
+
+  let trace3 = {
+    x: local
+      ? Object.keys(summary[index].timeline.recovered)
+      : Object.keys(summary.recovered),
+    y: local
+      ? Object.values(summary[index].timeline.recovered)
+      : Object.values(summary.recovered),
+    type: "scatter",
+    name: "recovered",
+  };
+
+  let layout = {
+    title: {
+      text: local ? `<b>${summary[index].country}</b>` : "<b>Global</br>",
+      font: {
+        family: "Times New Roman, monospace",
+        size: 24,
+      },
+      xref: "paper",
+      x: 0.5,
+    },
+    xaxis: {
+      title: {
+        text: "<b>Date</b>",
+        font: {
+          family: "Times New Roman, monospace",
+          size: 18,
+        },
+      },
+    },
+    yaxis: {
+      title: {
+        text: "<b>Number of Occurances</b>",
+        font: {
+          family: "Times New Roman, monospace",
+          size: 18,
+        },
+      },
+    },
+    legend: {
+      x: window.innerWidth > 600 ? 0.25 : -0.2,
+      y: 1.1,
+      orientation: "h",
+    },
+    width:
+      window.innerWidth >= 993
+        ? 0.4 * window.innerWidth - 10
+        : window.innerWidth - 10,
+  };
+
+  let config = { responsive: true };
+  let data = [trace1, trace2, trace3];
+
+  let plot_id = local ? "local_graph" : "global_graph";
+  Plotly.newPlot(plot_id, data, layout, config);
 }
 
 function displayStatsPerCountry(summary) {
@@ -278,11 +438,7 @@ function displayStatsPerCountry(summary) {
   addText(summary);
 
   $("#country-switch").on("change", function () {
-    if ($(this).is(":checked")) {
-      addText(summary);
-    } else {
-      $("#svg-map text").hide();
-    }
+    $(this).is(":checked") ? addText(summary) : $("#svg-map text").hide();
   });
 
   // color countries based on number of cases
@@ -335,7 +491,7 @@ function displayStatsPerCountry(summary) {
           path.css("fill", "cyan");
 
           let country = summary[index];
-          let stats = [
+          let hover_stats = [
             { Country: [country.country, country.countryInfo.iso2] },
             { "New Confirmed": country.todayCases },
             { "Total Confirmed": country.cases },
@@ -347,8 +503,8 @@ function displayStatsPerCountry(summary) {
           ];
 
           $.each($info_box, (index) => {
-            let key = Object.keys(stats[index])[0],
-              value = Object.values(stats[index])[0];
+            let key = Object.keys(hover_stats[index])[0],
+              value = Object.values(hover_stats[index])[0];
 
             if (index == 0) {
               $info_box.eq(index).html(`${value[0]} (${value[1]})`);
@@ -392,8 +548,8 @@ function displayStatsPerCountry(summary) {
     .children("input[type='checkbox']")
     .on("change", () => displayContinents(summary));
 
-  var countries_string = "";
-  var countries = [];
+  var countries_string = "",
+    countries = [];
   $.each(summary, (index, value) => {
     countries_string += value.country + "%2C%20";
     countries.push(value.country);
@@ -429,143 +585,7 @@ $.ajax({
   success: (data) => displayStatsPerCountry(data),
 });
 
-function plotHistory(summary, countries, local) {
-  var not_available_countries = [
-    "Greenland",
-    "Faroe Islands",
-    "Falkland Islands (Malvinas)",
-    "Réunion",
-    "New Caledonia",
-  ];
-
-  plotData(summary, local, 0); // default plot
-
-  if (local) {
-    $(document).on("click touchstart", "path", function () {
-      $(this).animate(
-        {
-          opacity: 0.25,
-          "stroke-width": "10px",
-        },
-        2000,
-        "linear"
-      );
-
-      $(this).animate(
-        {
-          opacity: 1,
-          "stroke-width": "1px",
-        },
-        1000,
-        "linear"
-      );
-
-      if (not_available_countries.includes($(this).attr("data-name"))) {
-        alert(`${$(this).attr("data-name")} doesn't have any historical data`);
-        return;
-      } else {
-        let option_index = countries.indexOf($(this).attr("data-name"));
-        plotData(summary, local, option_index);
-      }
-
-      $(".table-position input")
-        .val($(this).attr("data-name"))
-        .trigger("keyup.DT");
-    });
-  }
-}
-
-function plotData(summary, local, index) {
-  var trace1 = {
-    x: local
-      ? Object.keys(summary[index].timeline.cases)
-      : Object.keys(summary.cases),
-    y: local
-      ? Object.values(summary[index].timeline.cases)
-      : Object.values(summary.cases),
-    type: "scatter",
-    name: "cases",
-  };
-
-  var trace2 = {
-    x: local
-      ? Object.keys(summary[index].timeline.deaths)
-      : Object.keys(summary.deaths),
-    y: local
-      ? Object.values(summary[index].timeline.deaths)
-      : Object.values(summary.deaths),
-    type: "scatter",
-    name: "deaths",
-  };
-
-  var trace3 = {
-    x: local
-      ? Object.keys(summary[index].timeline.recovered)
-      : Object.keys(summary.recovered),
-    y: local
-      ? Object.values(summary[index].timeline.recovered)
-      : Object.values(summary.recovered),
-    type: "scatter",
-    name: "recovered",
-  };
-
-  var layout = {
-    title: {
-      text: local ? `<b>${summary[index].country}</b>` : "<b>Global</br>",
-      font: {
-        family: "Times New Roman, monospace",
-        size: 24,
-      },
-      xref: "paper",
-      x: 0.5,
-    },
-    xaxis: {
-      title: {
-        text: "<b>Date</b>",
-        font: {
-          family: "Times New Roman, monospace",
-          size: 18,
-        },
-      },
-    },
-    yaxis: {
-      title: {
-        text: "<b>Number of Occurances</b>",
-        font: {
-          family: "Times New Roman, monospace",
-          size: 18,
-        },
-      },
-    },
-    legend: {
-      x: window.innerWidth > 600 ? 0.25 : -0.2,
-      y: 1.1,
-      orientation: "h",
-    },
-    width:
-      window.innerWidth > 993
-        ? 0.4 * window.innerWidth - 10
-        : window.innerWidth - 10,
-  };
-
-  var config = { responsive: true };
-  var data = [trace1, trace2, trace3];
-
-  let plot_id = local ? "local_graph" : "global_graph";
-  Plotly.newPlot(plot_id, data, layout, config);
-}
-
-var text = [
-  "≤100% <br><br> >87.5%",
-  "≤87.5% <br><br> >75.0%",
-  "≤75.0% <br><br> >62.5%",
-  "≤62.5% <br><br> >50.0%",
-  "≤50.0% <br><br> >37.5%",
-  "≤37.5% <br><br> >25.0%",
-  "≤25.0% <br><br> >12.5%",
-  "≤12.5% <br><br> ≥0.00%",
-];
-
+// color bar on the side
 var rect_colors = $("#colorbar").children();
 for (var i = 0; i <= colors.length; i++) {
   if (i < colors.length) {
@@ -575,22 +595,8 @@ for (var i = 0; i <= colors.length; i++) {
   rect_colors.eq(i).html("<p>" + text[i] + "</p>");
 }
 
-var panZoom = svgPanZoom("#svg-map", {
-  panEnabled: true,
-  controlIconsEnabled: false,
-  zoomEnabled: true,
-  dblClickZoomEnabled: true,
-  mouseWheelZoomEnabled: true,
-  preventMouseEventsDefault: true,
-  zoomScaleSensitivity: 0.2,
-  minZoom: 0.2,
-  maxZoom: 5,
-  fit: true,
-  contain: false,
-  center: true,
-  refreshRate: "auto",
-});
-
+// zooming and panning functionality of the map
+var panZoom = svgPanZoom("#svg-map", pan_zoom_settings);
 $("#fit-screen").on("click", (e) => {
   panZoom.reset();
 });
