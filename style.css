@@ -415,6 +415,7 @@ svg a text {
     -webkit-box-direction: normal;
     -ms-flex-direction: column;
     flex-direction: column;
+    padding: 3px;
   }
 
   .global-info .row1-global,
@@ -423,8 +424,8 @@ svg a text {
   }
 
   .global-info p {
-    padding: 3px 2px;
-    margin: 3px 10px;
+    padding: 1px 2px;
+    margin: 2px 10px;
     width: 150px;
   }
 
@@ -584,13 +585,13 @@ svg a text {
     -webkit-transform: scale(3);
     -ms-transform: scale(3);
     transform: scale(3);
-    height: 300px;
+    height: 250px;
   }
 
   #svg-map {
-    -webkit-transform: translate(-60px, 25px);
-    -ms-transform: translate(-60px, 25px);
-    transform: translate(-60px, 25px);
+    -webkit-transform: translate(-60px, 0px);
+    -ms-transform: translate(-60px, 0px);
+    transform: translate(-60px, 0px);
   }
 
   #fit-screen,
