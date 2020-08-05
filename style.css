@@ -373,7 +373,7 @@ svg a text {
 
 /* GRAPHS */
 .graphs {
-  padding: 10px 0;
+  padding: 0;
   border: none;
   background: rgba(0, 0, 0, 0.6);
   display: -webkit-box;
@@ -390,8 +390,12 @@ svg a text {
   align-content: center;
 }
 
+.graphs #local_graph {
+  margin: 10px 5px 10px 10px;
+}
+
 .graphs #global_graph {
-  margin-left: 10px;
+  margin: 10px 10px 10px 5px;
 }
 
 /* TABLE */
@@ -640,11 +644,11 @@ svg a text {
   }
 
   .graphs #local_graph {
-    margin: 10px 5px;
+    margin: 10px;
   }
 
   .graphs #global_graph {
-    margin: 10px 5px;
+    margin: 10px;
   }
 
   /* TABLE */
@@ -879,11 +883,11 @@ svg a text {
   }
 
   .graphs #local_graph {
-    margin: 10px 5px 5px 5px;
+    margin: 10px;
   }
 
   .graphs #global_graph {
-    margin: 5px 5px 10px 5px;
+    margin: 10px;
   }
 
   /* TABLE */
@@ -1158,11 +1162,11 @@ svg a text {
   }
 
   .graphs #local_graph {
-    margin: 10px 5px;
+    margin: 10px 5px 10px 10px;
   }
 
   .graphs #global_graph {
-    margin: 10px 5px;
+    margin: 10px 10px 10px 5px;
   }
 
   /* TABLE */
@@ -1433,11 +1437,11 @@ svg a text {
   }
 
   .graphs #local_graph {
-    margin: 10px 2px;
+    margin: 10px 5px 10px 10px;
   }
 
   .graphs #global_graph {
-    margin: 10px 2px;
+    margin: 10px 10px 10px 5px;
   }
 
   /* TABLE */

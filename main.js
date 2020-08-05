@@ -196,24 +196,6 @@ function statisticHeatMap(summary) {
   });
 }
 
-function displayGlobalStatistics(summary) {
-  if (summary["affectedCountries"] == 215) {
-    summary["affectedCountries"] = 213; // 2 ships don't count as countries
-  }
-
-  for (let index in allowed_values) {
-    if (index < allowed_values.length - 1) {
-      html_val = numberWithCommas(summary[allowed_values[index]]);
-      $(".global-info").find("span").eq(index).html(html_val);
-    } else {
-      html_val = convertStringToDateTime(summary[allowed_values[index]]);
-      $("#update-time span").html(html_val);
-    }
-  }
-
-  addTableRow(summary);
-}
-
 function addTableRow(summary) {
   var summary_vals = Object.values(summary);
   var table_row_string;
@@ -272,23 +254,33 @@ function displayContinents(summary) {
 
   // for continent updating
   var stats = {
+    updated: 0,
     cases: 0,
-    deaths: 0,
-    recovered: 0,
     todayCases: 0,
+    deaths: 0,
     todayDeaths: 0,
+    recovered: 0,
     todayRecovered: 0,
     active: 0,
     critical: 0,
-    affectedCountries: 0,
+    casesPerOneMillion: 0,
+    deathsPerOneMillion: 0,
+    tests: 0,
+    testsPerOneMillion: 0,
     population: 0,
-    updated: 0,
+    oneCasePerPeople: 0,
+    oneDeathPerPeople: 0,
+    oneTestPerPeople: 0,
+    activePerOneMillion: 0,
+    recoveredPerOneMillion: 0,
+    criticalPerOneMillion: 0,
+    affectedCountries: 213,
   };
 
   $.each(summary, (index, value) => {
     if (continent_included.includes(value.continent)) {
       $.each(stats, (pos) => {
-        stats[pos] += value[pos];
+        if (allowed_values.includes(pos)) stats[pos] += value[pos];
       });
     }
   });
@@ -300,51 +292,64 @@ function displayContinents(summary) {
   if ($("#country-switch").is(":checked")) {
     addText(summary);
   }
+
   displayGlobalStatistics(stats);
 }
 
-function plotHistory(summary, countries, local) {
-  var not_available_countries = [
-    "Greenland",
-    "Faroe Islands",
-    "Falkland Islands (Malvinas)",
-    "Réunion",
-    "New Caledonia",
-  ];
+function displayGlobalStatistics(summary) {
+  if (summary["affectedCountries"] == 215) {
+    summary["affectedCountries"] = 213; // 2 ships don't count as countries
+  }
 
+  for (let index in allowed_values) {
+    if (index < allowed_values.length - 1) {
+      html_val = numberWithCommas(summary[allowed_values[index]]);
+      $(".global-info").find("span").eq(index).html(html_val);
+    } else {
+      html_val = convertStringToDateTime(summary[allowed_values[index]]);
+      $("#update-time span").html(html_val);
+    }
+  }
+
+  var table_cell_match = $('#DataTables_Table_0_wrapper td:contains("Global")');
+  if (!table_cell_match.length) {
+    addTableRow(summary);
+  }
+}
+
+function plotHistory(summary, countries, local) {
   plotData(summary, local, 0); // default plot
 
   if (local) {
     $(document).on("click touchstart", "path", function () {
-      $(this).animate(
-        {
-          opacity: 0.25,
-          "stroke-width": "10px",
-        },
-        2000,
-        "linear"
-      );
+      try {
+        $(this).animate(
+          {
+            opacity: 0.25,
+            "stroke-width": "10px",
+          },
+          2000,
+          "linear"
+        );
 
-      $(this).animate(
-        {
-          opacity: 1,
-          "stroke-width": "1px",
-        },
-        1000,
-        "linear"
-      );
+        $(this).animate(
+          {
+            opacity: 1,
+            "stroke-width": "1px",
+          },
+          1000,
+          "linear"
+        );
 
-      if (not_available_countries.includes($(this).attr("data-name"))) {
-        alert(`${$(this).attr("data-name")} doesn't have any historical data`);
-        return;
-      } else {
         let option_index = countries.indexOf($(this).attr("data-name"));
         plotData(summary, local, option_index);
-      }
 
-      $(".table-position input")
-        .val($(this).attr("data-name"))
-        .trigger("keyup.DT");
+        $(".table-position input")
+          .val($(this).attr("data-name"))
+          .trigger("keyup.DT");
+      } catch {
+        alert(`${$(this).attr("data-name")} doesn't have any historical data`);
+      }
     });
   }
 }
@@ -412,14 +417,18 @@ function plotData(summary, local, index) {
       },
     },
     legend: {
-      x: window.innerWidth > 600 ? 0.25 : -0.2,
+      x: window.innerWidth > 600 ? 0.25 : 0.05,
       y: 1.1,
       orientation: "h",
     },
     width:
       window.innerWidth >= 993
-        ? 0.4 * window.innerWidth - 10
-        : window.innerWidth - 10,
+        ? 0.4 * window.innerWidth - 15
+        : window.innerWidth - 20,
+    margin: {
+      r: 20,
+      l: 65,
+    },
   };
 
   let config = { responsive: true };
