@@ -10,12 +10,13 @@ This is an interactive map with worldwide COVID-19 statistics. This map is kept 
 
 ## Usage:
 
-Visit https://lbragile.github.io/COVID19-World-Statistics/
+Visit https://simpleglobalstats.com
 
 ## Todo
 
-- [ ] User control switch implementation
-- [ ] Graphs at the bottom, given a user clicks on a country (display data over months)
+- [x] User control switch implementation
+- [x] Graphs at the bottom, given a user clicks on a country (display data over months)
+- [x] Table with user click information
 - [ ] Percentage gain/loss from previous day in both global and local
 - [ ] List of credible sources user can visit for more information/news (websites/youtube channels)
 
